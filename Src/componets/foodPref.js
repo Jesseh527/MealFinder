@@ -29,13 +29,20 @@ const ItemManagement = () => {
   const [text, setText] = useState('');
 
   const addItem = (item, list, setList) => {
-    if (item.trim() !== '' && item.trim() ) {
-      setList((prevList) => [...prevList, item]);
-      setText('');
-      
+    if (item.trim() === '') {
+      alert('Enter an item.');
+      return; // Don't add empty items
     }
+  
+    // Check if the item is already in the list
+    if (list.includes(item)) {
+      alert('Item already exists in the list.');
+      return; // Don't add duplicate items
+    }
+  
+    setList((prevList) => [...prevList, item]);
+    setText('');
   };
-
   const removeItem = (item, list, setList) => {
     setList((prevList) => prevList.filter((i) => i !== item));
   };
