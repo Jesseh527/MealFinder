@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View,Image } from 'react-native';
+import { Text, View,Image,Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -25,7 +25,8 @@ export default function MyTabs() {
         <View>
           
         
-         <Image  style={{height:120, width:120, alignSelf:'center'}} source={require("../../assets/MealFinderLogo2.png")}/>
+         <Image  style={{height:120, width:120, alignSelf: Platform.OS == 'ios' ? 'flex-start':'center'}} source={require("../../assets/MealFinderLogo2.png")}/>
+         
          </View>
       ),
       
