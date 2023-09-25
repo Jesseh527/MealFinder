@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList } from 'react-native';
+import { View, Text, TextInput, Button, FlatList,Image,TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const ItemList = ({ data, onRemoveItem }) => {
   return (
     <FlatList
+      style = {{flexDirection:'row'}}
+      numColumns={3}
       data={data}
       renderItem={({ item }) => (
-        <View>
+        <View style= {{ flexDirection:'row', paddingRight:10} }>
           <Text>{item}</Text>
-          <Button title="Remove" onPress={() => onRemoveItem(item)} />
+          
+          <TouchableOpacity onPress={() => onRemoveItem(item)}>
+            <Ionicons name='remove-circle-outline' size={25} style ={{height:25,width:25}}/>
+          </TouchableOpacity>
         </View>
       )}
       keyExtractor={(item) => item.toString()}
@@ -23,9 +29,10 @@ const ItemManagement = () => {
   const [text, setText] = useState('');
 
   const addItem = (item, list, setList) => {
-    if (item.trim() !== '') {
+    if (item.trim() !== '' && item.trim() ) {
       setList((prevList) => [...prevList, item]);
       setText('');
+      
     }
   };
 
@@ -35,29 +42,35 @@ const ItemManagement = () => {
 
   return (
     <View>
+    <View style = {{flexDirection: 'row'}}>
       <TextInput
-        placeholder="Enter an item..."
+        placeholder="Enter an item to add to a list"
         value={text}
         onChangeText={(value) => setText(value)}
       />
-      <Button
-        title="Add to Favorite Foods"
+      {/* <TouchableOpacity>
+        <Ionicons name='heart-outline' size={25} style ={{height:25,width:25}}/>
         onPress={() => addItem(text, favoriteFoods, setFavoriteFoods)}
-      />
-      <Button
-        title="Add to Hated Foods"
-        onPress={() => addItem(text, hatedFoods, setHatedFoods)}
-      />
-      <Button
-        title="Add to Allergies"
-        onPress={() => addItem(text, allergies, setAllergies)}
-      />
+      </TouchableOpacity> */}
+      <TouchableOpacity onPress={() => addItem(text, favoriteFoods, setFavoriteFoods)}>
+      <Ionicons name='heart-outline'  size={25} style ={{height:25,width:25}}/>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={() => addItem(text, hatedFoods, setHatedFoods)}>
+  <Ionicons name='heart-dislike-outline' size={25} style ={{height:25,width:25}}/>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={() => addItem(text, allergies, setAllergies)}>
+  <Ionicons name='warning-outline' size={25} style ={{height:25,width:25}}/>
+  </TouchableOpacity>
+      </View>
+
+      <View>
       <Text>Favorite Foods:</Text>
       <ItemList data={favoriteFoods} onRemoveItem={(item) => removeItem(item, favoriteFoods, setFavoriteFoods)} />
       <Text>Hated Foods:</Text>
       <ItemList data={hatedFoods} onRemoveItem={(item) => removeItem(item, hatedFoods, setHatedFoods)} />
       <Text>Allergies:</Text>
       <ItemList data={allergies} onRemoveItem={(item) => removeItem(item, allergies, setAllergies)} />
+    </View>
     </View>
   );
 };
