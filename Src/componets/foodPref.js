@@ -1,57 +1,65 @@
-// FavoriteFoods.js
-// need to install Async and v4 AND uuidv4
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import { v4 as uuidv4 } from 'uuid';
 
-export default function FavoriteFoods() {
-  const [foods, setFoods] = useState([]);
-  const [newFood, setNewFood] = useState('');
+const ItemList = ({ data, onRemoveItem }) => {
+  return (
+    <FlatList
+      data={data}
+      renderItem={({ item }) => (
+        <View>
+          <Text>{item}</Text>
+          <Button title="Remove" onPress={() => onRemoveItem(item)} />
+        </View>
+      )}
+      keyExtractor={(item) => item.toString()}
+    />
+  );
+};
 
-  useEffect(() => {
-    // Load favorite foods from AsyncStorage
-    AsyncStorage.getItem('favoriteFoods').then((data) => {
-      if (data) {
-        setFoods(JSON.parse(data));
-      }
-    });
-  }, []);
+const ItemManagement = () => {
+  const [favoriteFoods, setFavoriteFoods] = useState([]);
+  const [hatedFoods, setHatedFoods] = useState([]);
+  const [allergies, setAllergies] = useState([]);
+  const [text, setText] = useState('');
 
-  const addFood = () => {
-    if (newFood) {
-      const foodItem = { id: uuidv4(), name: newFood };
-      setFoods([...foods, foodItem]);
-      AsyncStorage.setItem('favoriteFoods', JSON.stringify([...foods, foodItem]));
-      setNewFood('');
+  const addItem = (item, list, setList) => {
+    if (item.trim() !== '') {
+      setList((prevList) => [...prevList, item]);
+      setText('');
     }
   };
 
-  const removeFood = (id) => {
-    const updatedFoods = foods.filter((food) => food.id !== id);
-    setFoods(updatedFoods);
-    AsyncStorage.setItem('favoriteFoods', JSON.stringify(updatedFoods));
+  const removeItem = (item, list, setList) => {
+    setList((prevList) => prevList.filter((i) => i !== item));
   };
 
   return (
     <View>
-      <Text>Favorite Foods</Text>
       <TextInput
-        placeholder="Add a favorite food"
-        value={newFood}
-        onChangeText={(text) => setNewFood(text)}
+        placeholder="Enter an item..."
+        value={text}
+        onChangeText={(value) => setText(value)}
       />
-      <Button title="Add" onPress={addFood} />
-      <FlatList
-        data={foods}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View>
-            <Text>{item.name}</Text>
-            <Button title="Remove" onPress={() => removeFood(item.id)} />
-          </View>
-        )}
+      <Button
+        title="Add to Favorite Foods"
+        onPress={() => addItem(text, favoriteFoods, setFavoriteFoods)}
       />
+      <Button
+        title="Add to Hated Foods"
+        onPress={() => addItem(text, hatedFoods, setHatedFoods)}
+      />
+      <Button
+        title="Add to Allergies"
+        onPress={() => addItem(text, allergies, setAllergies)}
+      />
+      <Text>Favorite Foods:</Text>
+      <ItemList data={favoriteFoods} onRemoveItem={(item) => removeItem(item, favoriteFoods, setFavoriteFoods)} />
+      <Text>Hated Foods:</Text>
+      <ItemList data={hatedFoods} onRemoveItem={(item) => removeItem(item, hatedFoods, setHatedFoods)} />
+      <Text>Allergies:</Text>
+      <ItemList data={allergies} onRemoveItem={(item) => removeItem(item, allergies, setAllergies)} />
     </View>
   );
-}
+};
+
+export default ItemManagement;

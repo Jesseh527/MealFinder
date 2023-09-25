@@ -5,6 +5,7 @@ import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SettingsPrefrence from '../componets/settingPrefrence';
 // import FavoriteFoods from '../componets/foodPref';
+import ItemManagement from '../componets/foodPref';
 export default function SettingsScreen() {
   
 
@@ -21,7 +22,7 @@ export default function SettingsScreen() {
   const toggleNewPost = () => setIsNewPost(previousState => !previousState);
   
     return (
-      // <ScrollView style ={{flex:1}}>
+      <ScrollView style ={{flex:1}}>
       <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start', paddingLeft:30 }}>
         <Text>Settings!</Text>
 
@@ -75,6 +76,7 @@ export default function SettingsScreen() {
         </View>
         <View><Text style = {styles.mainSetting}>Prefrences</Text>
         <View style= {{paddingLeft:30}}>
+        <ItemManagement/>
             {/* <Text style = {styles.subSettingText}>Favorate food</Text> 
             <Text style = {styles.subSettingText}>Hated foods</Text> 
             <SettingsPrefrence></SettingsPrefrence>
@@ -84,6 +86,7 @@ export default function SettingsScreen() {
         </View>
 
       </View>
+      </ScrollView>
     );
   }
 
