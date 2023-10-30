@@ -1,3 +1,4 @@
+//tab.js
 import * as React from 'react';
 import { Text, View,Image,Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,11 +9,25 @@ import RecepiScreen from '../Pages/RecepiSceen';
 import HomeScreen from '../Pages/homeScreen';
 import SettingsScreen from '../Pages/settingsScreen';
 import LoginScreen from '../Pages/loginScreen';
-import ProfieScreen from '../Pages/profileScreen';
-
+import ProfileScreen from '../Pages/profileScreen';
+import { useState,useEffect } from 'react';
+import { onAuthStateChanged} from '@firebase/auth';
+import { User } from '@firebase/auth';
+import { FIREBASE_AUTH } from './config';
 const Tab = createBottomTabNavigator();
 
 export default function MyTabs() {
+   const [currentUser, setUser] = useState(null);//maybe add back <User | null> 
+
+  useEffect(() => {
+    onAuthStateChanged(FIREBASE_AUTH, (authUser) => {
+      
+        console.log("AAAAAAA1:", authUser);
+        setUser(authUser);
+        console.log("AAAAA2:", currentUser);
+      
+    });
+  }, []);
   return (
     
     <Tab.Navigator screenOptions={{
@@ -37,7 +52,7 @@ export default function MyTabs() {
         <Ionicons name="home" color={color} size={size} />
       ),
     }} />
-      <Tab.Screen name="Profie" component={ProfieScreen} options={{
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{
       
       tabBarIcon: ({ color, size }) => (
         <Ionicons name="person-outline" color={color} size={size} />
@@ -55,8 +70,7 @@ export default function MyTabs() {
         <Ionicons name="fast-food-outline" color={color} size={size} />
       ),
     }}/>
-      <Tab.Screen name="Login" component={LoginScreen} options={{
-      
+      <Tab.Screen name="Login"  component={()=> <LoginScreen currentUser={currentUser}  />}  options={{
       tabBarIcon: ({ color, size }) => (
         <Ionicons name="log-in-outline" color={color} size={size} />
       ),
