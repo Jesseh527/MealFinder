@@ -1,14 +1,15 @@
 // LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { getDatabase, ref, set,update,onValue,data,get } from "firebase/database";
 import {FIREBASE_AUTH, db} from "../componets/config"
 import { async } from '@firebase/util';
+import {signInWithEmailAndPassword,createUserWithEmailAndPassword} from "firebase/auth";
 
 const LoginScreen = () => {
   const [isLogin,setIsLogin] = useState(false);
-  // const [authLogin, setAuthLogin] = useState(false);
+  const [authLogin, setAuthLogin] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState(''); // use later
@@ -18,9 +19,10 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     setLoading(true);
     try{
-      const response = await signInWithEamilAndPasssword(auth,email,password)
+      const response = await signInWithEmailAndPassword(auth,email,password)
+      console.log("log in success: " + email + ":" + password)
       console.log(response)
-    }catch{
+    }catch(error){
       console.log(error)
       alert("sign in failed: "+ error.message);
     }
@@ -38,7 +40,7 @@ const LoginScreen = () => {
       console.log(response)
       alert("check your email ");
 
-    }catch{
+    }catch(error){
       console.log(error)
       alert("sign in failed: "+ error.message);
     }
@@ -73,6 +75,7 @@ const LoginScreen = () => {
 
 
     <View style={styles.container}>
+    <KeyboardAvoidingView behavior='padding'>
       <Text>signup Screen</Text>
       <TextInput
         placeholder="Email"
@@ -97,6 +100,7 @@ const LoginScreen = () => {
       <Button style ={{ justifyContent:'space-between', padding:10}} title="sign up" onPress={handleSignup} />
       <Text style ={{ justifyContent:'space-between', padding:10}} title = "already have an acount" onPress={(isLogin) => setIsLogin(true)}>"already have an acount"</Text>
       </View>
+      </KeyboardAvoidingView>
     </View>
   );
     }else{return (//login
@@ -104,6 +108,7 @@ const LoginScreen = () => {
 
 
     <View style={styles.container}>
+      <KeyboardAvoidingView behavior='padding'>
       <Text>Login Screen</Text>
       
       <TextInput
@@ -124,6 +129,7 @@ const LoginScreen = () => {
       <Button style ={{ justifyContent:'space-between', padding:10}} title="Login" onPress={handleLogin}  />
       <Text style ={{ justifyContent:'space-between', padding:10}} title = "already have an acount" onPress={(isLogin) => setIsLogin(false)}>"dont have an account?"</Text>
       </View>
+      </KeyboardAvoidingView>
     </View>
   );
   };
