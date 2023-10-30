@@ -3,61 +3,67 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { getDatabase, ref, set,update,onValue,data,get } from "firebase/database";
-import {db} from "../componets/config"
+import {FIREBASE_AUTH, db} from "../componets/config"
+import { async } from '@firebase/util';
 
 const LoginScreen = () => {
   const [isLogin,setIsLogin] = useState(false);
-  const [authLogin, setAuthLogin] = useState(false);
+  // const [authLogin, setAuthLogin] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState(''); // use later
+  const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
 
-  const handleLogin = () => {//cahnage it
-    // const starCountRef = ref(db, 'user/' + username );
-    
-// onValue(starCountRef, (snapshot) => {
-//   const data = snapshot.val();
-//   alert(data)
-//   if(data.password == password){
-//     (authLogin) => setAuthLogin(true)
-//   }else{alert("wrong password")}
-//   updateStarCount(postElement, data);
-// })
-
-const dbRef = ref(getDatabase());
-get(child(dbRef, `users/${username}`)).then((snapshot) => {
-  if (snapshot.exists()) {
-    console.log(snapshot.val());
-  } else {
-    console.log("No data available");
-  }
-}).catch((error) => {
-  console.error(error);
-});
-
-  };
+  const handleLogin = async () => {
+    setLoading(true);
+    try{
+      const response = await signInWithEamilAndPasssword(auth,email,password)
+      console.log(response)
+    }catch{
+      console.log(error)
+      alert("sign in failed: "+ error.message);
+    }
+    finally{
+      setLoading(false);
+    }
+   };
 
 
 
-  const handleSignup = () => {
-    set(ref(db, 'users/' + username), { // change SET to UPDATE to update current data
-      username: username,
-      email:email,
-      password:password,
-      profile:{
-        bio: "About...",
-        profileImage: './splash.png'
-      }
-    }).then(()=>{
-      //data saved
-      alert('data updated')
-      setAuthLogin(true)
+  const handleSignup = async () => {
+    setLoading(true);
+    try{
+      const response = await createUserWithEmailAndPassword(auth,email,password)
+      console.log(response)
+      alert("check your email ");
+
+    }catch{
+      console.log(error)
+      alert("sign in failed: "+ error.message);
+    }
+    finally{
+      setLoading(false);
+    }
+ 
+    // set(ref(db, 'users/' + username), { // change SET to UPDATE to update current data
+    //   username: username,
+    //   email:email,
+    //   password:password,
+    //   profile:{
+    //     bio: "About...",
+    //     profileImage: './splash.png'
+    //   }
+    // }).then(()=>{
+    //   //data saved
+    //   alert('data updated')
+    //   setAuthLogin(true)
       
-    })
-    .catch((error)=>{
-      //failed
-      alert(error);
-    })
+    // })
+    // .catch((error)=>{
+    //   //failed
+    //   alert(error);
+    // })
   };
   
   if(!authLogin){
