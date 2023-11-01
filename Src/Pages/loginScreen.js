@@ -6,8 +6,9 @@ import { getDatabase, ref, set,update,onValue,data,get } from "firebase/database
 import {FIREBASE_AUTH, db} from "../componets/config"
 import { async } from '@firebase/util';
 import {signInWithEmailAndPassword,createUserWithEmailAndPassword} from "firebase/auth";
-
-const LoginScreen = ({currentUser}) => {
+import { useCurrentUser  } from "../componets/tab"
+const LoginScreen = () => {
+  const currentUser = useCurrentUser();
   const [isLogin,setIsLogin] = useState(false);
   const [authLogin, setAuthLogin] = useState(false);
   const [username, setUsername] = useState('');
@@ -19,7 +20,7 @@ const LoginScreen = ({currentUser}) => {
   const handleLogin = async () => {
     setLoading(true);
     try{
-      console.log("ZZZZZZZZZZZZZZZZZZZZZZZ",currentUser)
+      console.log("ZZZZZZZZZZZZZZZZZZZZZZZ",currentUser )
       const response = await signInWithEmailAndPassword(auth,email,password)
       console.log("log in success: " + email + ":" + password)
       console.log(response)
@@ -50,30 +51,13 @@ const LoginScreen = ({currentUser}) => {
       setLoading(false);
     }
  
-    // set(ref(db, 'users/' + username), { // change SET to UPDATE to update current data
-    //   username: username,
-    //   email:email,
-    //   password:password,
-    //   profile:{
-    //     bio: "About...",
-    //     profileImage: './splash.png'
-    //   }
-    // }).then(()=>{
-    //   //data saved
-    //   alert('data updated')
-    //   setAuthLogin(true)
-      
-    // })
-    // .catch((error)=>{
-    //   //failed
-    //   alert(error);
-    // })
+   
   };
   
   
   return (
     <View style={styles.container}>
-      {currentUser == null ? (
+      {currentUser  == null ? (
         !isLogin ? ( // Sign up
           <View>
             <Text>Signup Screen</Text>
@@ -127,6 +111,7 @@ const LoginScreen = ({currentUser}) => {
       ) : (
         // User is logged in
         <View>
+        <Text>Hello: {currentUser.email}</Text>
           <Button title="Logout" onPress={() => FIREBASE_AUTH.signOut()} />
         </View>
       )}
@@ -144,6 +129,7 @@ const styles = StyleSheet.create({
   input: {
     width: '80%',
     height: 40,
+    width:250,
     borderColor: 'gray',
     alignSelf:"center",
     borderWidth: 1,

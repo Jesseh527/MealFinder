@@ -14,6 +14,12 @@ import { useState,useEffect } from 'react';
 import { onAuthStateChanged} from '@firebase/auth';
 import { User } from '@firebase/auth';
 import { FIREBASE_AUTH } from './config';
+export const UserContext = React.createContext();
+
+
+
+
+
 const Tab = createBottomTabNavigator();
 
 export default function MyTabs() {
@@ -29,7 +35,7 @@ export default function MyTabs() {
     });
   }, []);
   return (
-    
+    <UserContext.Provider value={currentUser}>
     <Tab.Navigator screenOptions={{
       tabBarStyle: { position: 'absolute', },
       headerTitleStyle: {
@@ -52,7 +58,7 @@ export default function MyTabs() {
         <Ionicons name="home" color={color} size={size} />
       ),
     }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{
+      <Tab.Screen name="Profile" component={ProfileScreen } options={{
       
       tabBarIcon: ({ color, size }) => (
         <Ionicons name="person-outline" color={color} size={size} />
@@ -70,14 +76,17 @@ export default function MyTabs() {
         <Ionicons name="fast-food-outline" color={color} size={size} />
       ),
     }}/>
-      <Tab.Screen name="Login"  component={()=> <LoginScreen currentUser={currentUser}  />}  options={{
+      <Tab.Screen name="Login"  component={LoginScreen}  options={{
       tabBarIcon: ({ color, size }) => (
         <Ionicons name="log-in-outline" color={color} size={size} />
       ),
     }}/>
     
     </Tab.Navigator>
-   
+    </UserContext.Provider>
   );
 
+}
+export function useCurrentUser() {
+  return React.useContext(UserContext);
 }
