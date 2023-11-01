@@ -2,11 +2,18 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
+import { useCurrentUser  } from "../componets/tab"
 const ProfieScreen = ({ navigation }) => {
+  const currentUser = useCurrentUser();
   return (
     <View style={styles.container}>
-      
-      <Text style={styles.heading}>Profile Screen</Text>
+      {currentUser  == null ? (<View>
+
+        <Text style ={{fontSize:20,padding:15}}>Please log in to acces your profile</Text>
+        <Button title='click her to go to your profile' onPress={()=> navigation.navigate('Login')}/>
+
+      </View>):(<View>
+        <Text style={styles.heading}>Profile Screen</Text>
       
       <View style={styles.profileInfo}>
       <ProfilePicture
@@ -14,9 +21,11 @@ const ProfieScreen = ({ navigation }) => {
         size={150} // Set the size of the profile picture
       />
         <Text>Name: John Doe</Text>
-        <Text>Email: johndoe@example.com</Text>
+        <Text>Email: {currentUser.email}</Text>
         <Text>Phone: (123) 456-7890</Text>
       </View>
+      </View>)}
+      
 
     </View>
   );

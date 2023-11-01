@@ -1,9 +1,11 @@
 // ProfilePicture.js
 import React, { useState } from 'react';
 import { Image, StyleSheet, View, Button } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
-
+// import ImagePicker from 'react-native-image-picker';
+import { useCurrentUser  } from "../componets/tab";
+import * as ImagePicker from 'react-native-image-picker';
 const ProfilePicture = () => {
+  const currentUser = useCurrentUser();
   const [imageSource, setImageSource] = useState(null);
 
   const selectImage = () => {
@@ -15,7 +17,7 @@ const ProfilePicture = () => {
       },
     };
 
-    ImagePicker.showImagePicker(options, (response) => {
+    ImagePicker.launchImageLibrary(options, (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {

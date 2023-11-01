@@ -37,7 +37,7 @@ const LoginScreen = () => {
 
   const handleSignup = async () => {
     setLoading(true);
-    try{
+    try{7
       const response = await createUserWithEmailAndPassword(auth,email,password)
       console.log(response)
       alert("check your email ");
