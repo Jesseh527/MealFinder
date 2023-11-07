@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import {getDatabase} from "firebase/database";
 import {getAuth} from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { async } from "@firebase/util";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -27,3 +28,14 @@ export const storage = getStorage();
 //Initialize  database
 export const db = getDatabase(app);
 export const FIREBASE_AUTH = getAuth(app);
+
+/**
+ * 
+ * @param {*} uri 
+ * @param {*} name 
+ */
+export const uploadToFirebase = async (uri,name) => {
+  const fetchResponse=  await fetch(uri);
+  const theBlob = await fetchResponse.blob();
+  console.log(theBlob);
+}

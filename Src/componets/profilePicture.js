@@ -5,7 +5,7 @@ import { Image, StyleSheet, View, Button } from 'react-native';
 import { useCurrentUser  } from "../componets/tab";
 import * as ImagePicker from 'expo-image-picker';
 import {ref as refS,uploadBytes,getDownloadURL} from "firebase/storage";
-import { db } from '../componets/config';
+import { db, uploadToFirebase } from '../componets/config';
 import { storage } from '../componets/config';
 import { ref as refD,set } from 'firebase/database';
 
@@ -48,6 +48,9 @@ const ProfilePicture = () => {
 
     if (!camResponse.canceled) {
       setImageSource(camResponse.assets[0].uri);
+      const {uri,fileName} = camResponse.assets[0];
+     const uploadResp = await uploadToFirebase(uri,fileName);
+
     }
   };
 //   if(cameraPermissions?.status !== ImagePicker.PermissionStatus.GRANTED){
@@ -63,10 +66,7 @@ const ProfilePicture = () => {
 // };
 return (
   <View style={[styles.container]}>
-    <Image
-      source={imageSource}
-      style={styles.image} 
-    />
+    {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
     <Button title="Select Image" onPress={selectImage} />
   </View>
 );
@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
   image: {
     width: 150,
     height: 150,
+    borderRadius: 200
   },
 });
 
