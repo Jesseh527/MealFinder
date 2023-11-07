@@ -3,41 +3,73 @@ import React, { useState } from 'react';
 import { Image, StyleSheet, View, Button } from 'react-native';
 // import ImagePicker from 'react-native-image-picker';
 import { useCurrentUser  } from "../componets/tab";
-import * as ImagePicker from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import {ref as refS,uploadBytes,getDownloadURL} from "firebase/storage";
+import { db } from '../componets/config';
+import { storage } from '../componets/config';
+import { ref as refD,set } from 'firebase/database';
+
+
 const ProfilePicture = () => {
+  // const [cameraPermissions, requestPermission] = ImagePicker.useCameraPermissions();
+
   const currentUser = useCurrentUser();
-  const [imageSource, setImageSource] = useState(null);
+  const [imageSource, setImageSource] = useState('');
+ 
+  // const submitData = () =>{
+  //   const storageRef = refS(storage,'image');
 
-  const selectImage = () => {
-    const options = {
-      title: 'Select Profile Picture',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
+  //   uploadBytes(storageRef,imageSource).then((snapshot) => {
+  //     console.log("uploaded a blod or file")
+  //   }).catch((error)=>{
+  //     console.log(error.message)
+  //   })
+  // }
 
-    ImagePicker.launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        // Set the selected image as the profile picture
-        setImageSource({ uri: response.uri });
-      }
+  // const handleChange = (e) =>{
+  //   if(e.target.files[0]){
+  //     setImageSource(e.target.file[0])
+  //   }
+  // }
+  
+  const selectImage  = async () => {
+    // No permissions request is necessary for launching the image library
+    // const{granted} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // if (!granted){
+    //   return;
+    // }
+    let camResponse = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
-  };
+    console.log("ayo");
 
-  return (
-    <View style={[styles.container]}>
-      <Image
-        source={imageSource || require('./splash.png')}
-        style={styles.image}
-      />
-      <Button title="Select Image" onPress={selectImage} />
-    </View>
-  );
+    if (!camResponse.canceled) {
+      setImageSource(camResponse.assets[0].uri);
+    }
+  };
+//   if(cameraPermissions?.status !== ImagePicker.PermissionStatus.GRANTED){
+//   return (
+//     <View style={[styles.container]}>
+//       <Image
+//         source={imageSource}
+//         style={styles.image} 
+//       />
+//       <Button title="Select Image" onPress={requestPermission} />
+//     </View>
+//   );
+// };
+return (
+  <View style={[styles.container]}>
+    <Image
+      source={imageSource}
+      style={styles.image} 
+    />
+    <Button title="Select Image" onPress={selectImage} />
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
