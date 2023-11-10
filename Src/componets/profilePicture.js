@@ -1,11 +1,11 @@
 // ProfilePicture.js
-import React, { useState } from 'react';
-import { Image, StyleSheet, View, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, View, Button,Alert } from 'react-native';
 // import ImagePicker from 'react-native-image-picker';
 import { useCurrentUser  } from "../componets/tab";
 import * as ImagePicker from 'expo-image-picker';
 import {ref as refS,uploadBytes,getDownloadURL} from "firebase/storage";
-import { db, uploadToFirebase } from '../componets/config';
+import { db, uploadToFirebase,listFiles } from '../componets/config';
 import { storage } from '../componets/config';
 import { ref as refD,set } from 'firebase/database';
 
@@ -15,22 +15,24 @@ const ProfilePicture = () => {
 
   const currentUser = useCurrentUser();
   const [imageSource, setImageSource] = useState('');
+  const [files,setFiles] = useState([]);
+  
  
-  // const submitData = () =>{
-  //   const storageRef = refS(storage,'image');
+useEffect(() => {
+  listFiles().then((listResp)=>{
+    const files = listResp.map((value)=>{
+      return {name: value.fullPath}
+    })
+    
+    setFiles(files)
+  })
+},[]);
+console.log(files)
 
-  //   uploadBytes(storageRef,imageSource).then((snapshot) => {
-  //     console.log("uploaded a blod or file")
-  //   }).catch((error)=>{
-  //     console.log(error.message)
-  //   })
-  // }
+/**
+ * 
+ */
 
-  // const handleChange = (e) =>{
-  //   if(e.target.files[0]){
-  //     setImageSource(e.target.file[0])
-  //   }
-  // }
   
   const selectImage  = async () => {
     // No permissions request is necessary for launching the image library
@@ -38,7 +40,8 @@ const ProfilePicture = () => {
     // if (!granted){
     //   return;
     // }
-    let camResponse = await ImagePicker.launchImageLibraryAsync({
+    try{
+    const camResponse = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
@@ -48,10 +51,22 @@ const ProfilePicture = () => {
 
     if (!camResponse.canceled) {
       setImageSource(camResponse.assets[0].uri);
-      const {uri,fileName} = camResponse.assets[0];
-     const uploadResp = await uploadToFirebase(uri,fileName);
+      const {uri} = camResponse.assets[0];//grabs image elemets
+      const fileName = uri.split('/').pop();// for image name//add somthing to grab user id or username
+     const uploadResp = await uploadToFirebase(uri,fileName,(v)=> console.log(v));
+     console.log(uploadResp)
+     listFiles().then((listResp)=>{
+      const files = listResp.map((value)=>{
+        return {name: value.fullPath}
+      })
+      
+      setFiles(files)
+    })
 
     }
+  } catch(e){
+    Alert.alert("Error Uploading Image " + e.message);
+  }
   };
 //   if(cameraPermissions?.status !== ImagePicker.PermissionStatus.GRANTED){
 //   return (
