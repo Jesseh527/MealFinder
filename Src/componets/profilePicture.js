@@ -4,7 +4,7 @@ import { Image, StyleSheet, View, Button,Alert } from 'react-native';
 // import ImagePicker from 'react-native-image-picker';
 import { useCurrentUser  } from "../componets/tab";
 import * as ImagePicker from 'expo-image-picker';
-import {ref as refS,uploadBytes,getDownloadURL} from "firebase/storage";
+import {ref as refS,uploadBytes,getDownloadURL, getStorage} from "firebase/storage";
 import { db, uploadToFirebase,listFiles } from '../componets/config';
 import { storage } from '../componets/config';
 import { ref as refD,set } from 'firebase/database';
@@ -19,13 +19,22 @@ const ProfilePicture = () => {
   
  
 useEffect(() => {
-  listFiles().then((listResp)=>{
-    const files = listResp.map((value)=>{
-      return {name: value.fullPath}
+  const func = async () => {
+    const imageStorage = getStorage();
+    const  imgRef = refS(imageStorage, "images/VDfRAQ051mYqJimKqcVZXiLcWhJ3");
+    console.log("TTTTTT"+ imgRef);
+    await getDownloadURL(imgRef).then((x)=>{
+      setImageSource(x);
+      
     })
+  }
+  // listFiles().then((listResp)=>{
+  //   const files = listResp.map((value)=>{
+  //     return {name: value.fullPath}
+  //   })
     
-    setFiles(files)
-  })
+  //   setFiles(files)
+  // })
 },[]);
 console.log(files)
 
@@ -50,10 +59,12 @@ console.log(files)
     console.log("ayo");
 
     if (!camResponse.canceled) {
-      setImageSource(camResponse.assets[0].uri);
+      // setImageSource(camResponse.assets[0].uri);
       const {uri} = camResponse.assets[0];//grabs image elemets
       const fileName = uri.split('/').pop();// for image name//add somthing to grab user id or username
-     const uploadResp = await uploadToFirebase(uri,fileName,(v)=> console.log(v));
+      const fileType =  fileName.split('.').pop();
+      const newFileName = currentUser.uid + fileType;
+     const uploadResp = await uploadToFirebase(uri,currentUser.uid ,(v)=> console.log(v));
      console.log(uploadResp)
      listFiles().then((listResp)=>{
       const files = listResp.map((value)=>{
@@ -68,17 +79,7 @@ console.log(files)
     Alert.alert("Error Uploading Image " + e.message);
   }
   };
-//   if(cameraPermissions?.status !== ImagePicker.PermissionStatus.GRANTED){
-//   return (
-//     <View style={[styles.container]}>
-//       <Image
-//         source={imageSource}
-//         style={styles.image} 
-//       />
-//       <Button title="Select Image" onPress={requestPermission} />
-//     </View>
-//   );
-// };
+
 return (
   <View style={[styles.container]}>
     {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}

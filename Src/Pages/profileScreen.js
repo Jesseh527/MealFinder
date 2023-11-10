@@ -21,6 +21,7 @@ const ProfieScreen = ({ navigation }) => {
         size={150} // Set the size of the profile picture
       />
         <Text>Name: John Doe</Text>
+        <Text>{currentUser.uid}</Text>
         <Text>Email: {currentUser.email}</Text>
         <Text>Phone: (123) 456-7890</Text>
       </View>
