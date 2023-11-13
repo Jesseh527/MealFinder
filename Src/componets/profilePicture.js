@@ -1,6 +1,6 @@
 // ProfilePicture.js
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, View, Button,Alert } from 'react-native';
+import { Image, StyleSheet, View, Button,Alert, TouchableOpacity } from 'react-native';
 // import ImagePicker from 'react-native-image-picker';
 import { useCurrentUser  } from "../componets/tab";
 import * as ImagePicker from 'expo-image-picker';
@@ -21,20 +21,22 @@ const ProfilePicture = () => {
 useEffect(() => {
   const func = async () => {
     const imageStorage = getStorage();
-    const  imgRef = refS(imageStorage, "images/VDfRAQ051mYqJimKqcVZXiLcWhJ3");
-    console.log("TTTTTT"+ imgRef);
+    const  imgRef = refS(imageStorage,"images/"+ currentUser.uid);
+    // console.log("TTTTTT"+ imgRef);
     await getDownloadURL(imgRef).then((x)=>{
       setImageSource(x);
       
     })
   }
-  // listFiles().then((listResp)=>{
-  //   const files = listResp.map((value)=>{
-  //     return {name: value.fullPath}
-  //   })
+  listFiles().then((listResp)=>{
+    const files = listResp.map((value)=>{
+      return {name: value.fullPath}
+    })
     
-  //   setFiles(files)
-  // })
+    setFiles(files);
+    func();
+  })
+  
 },[]);
 console.log(files)
 
@@ -56,16 +58,23 @@ console.log(files)
       aspect: [4, 3],
       quality: 1,
     });
-    console.log("ayo");
+    
 
     if (!camResponse.canceled) {
       // setImageSource(camResponse.assets[0].uri);
       const {uri} = camResponse.assets[0];//grabs image elemets
-      const fileName = uri.split('/').pop();// for image name//add somthing to grab user id or username
-      const fileType =  fileName.split('.').pop();
-      const newFileName = currentUser.uid + fileType;
+      
+      // const fileName = uri.split('/').pop();// for image name//add somthing to grab user id or username
+      // const fileType =  fileName.split('.').pop();
+      // const newFileName = currentUser.uid + fileType;
      const uploadResp = await uploadToFirebase(uri,currentUser.uid ,(v)=> console.log(v));
-     console.log(uploadResp)
+     const imageStorage = getStorage();
+     const  imgRef = refS(imageStorage,"images/"+ currentUser.uid);
+     // console.log("TTTTTT"+ imgRef);
+     await getDownloadURL(imgRef).then((x)=>{
+       setImageSource(x);
+       
+     })
      listFiles().then((listResp)=>{
       const files = listResp.map((value)=>{
         return {name: value.fullPath}
@@ -82,8 +91,10 @@ console.log(files)
 
 return (
   <View style={[styles.container]}>
+    <TouchableOpacity onPress={selectImage}>
     {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
-    <Button title="Select Image" onPress={selectImage} />
+    {/* <Button title="Select Image" onPress={selectImage} /> */}
+    </TouchableOpacity>
   </View>
 );
 };

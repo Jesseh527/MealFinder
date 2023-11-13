@@ -44,10 +44,10 @@ const listResp = await listAll(listRef)
  * @param {*} uri 
  * @param {*} name 
  */
-export const uploadToFirebase = async (uri,name,onProgress) => {
+export const uploadToFirebase = async (uri,name,onProgress) => { ///npm install whatwg-fetch@3.6.2 if there is a range error [200,599]
   const fetchResponse=  await fetch(uri);
   const theBlob = await fetchResponse.blob();
-  console.log(theBlob);
+  // console.log(theBlob);
 
 const imageRef = ref( getStorage(), 'images/' +  name);
 
