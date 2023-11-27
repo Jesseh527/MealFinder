@@ -14,17 +14,18 @@ const ProfilePicture = () => {
   // const [cameraPermissions, requestPermission] = ImagePicker.useCameraPermissions();
 
   const currentUser = useCurrentUser();
-  const [imageSource, setImageSource] = useState('');
+  const [imageSource, setImageSource] = useState("");
   const [files,setFiles] = useState([]);
   
+  const tempIm2 = require("../../assets/tempProfileImage.jpg");
  
 useEffect(() => {
   const func = async () => {
     const imageStorage = getStorage();
-    const  imgRef = refS(imageStorage,"images/"+ currentUser.uid);
-    // console.log("TTTTTT"+ imgRef);
+    const  imgRef = refS(imageStorage,"userImages/"+ currentUser.uid+".jpg");
+    console.log("TTTTTT"+ imgRef);
     await getDownloadURL(imgRef).then((x)=>{
-      setImageSource(x);
+      setImageSource(x); 
       
     })
   }
@@ -44,7 +45,6 @@ console.log(files)
  * 
  */
 
-  
   const selectImage  = async () => {
     // No permissions request is necessary for launching the image library
     // const{granted} = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -67,9 +67,10 @@ console.log(files)
       // const fileName = uri.split('/').pop();// for image name//add somthing to grab user id or username
       // const fileType =  fileName.split('.').pop();
       // const newFileName = currentUser.uid + fileType;
-     const uploadResp = await uploadToFirebase(uri,currentUser.uid ,(v)=> console.log(v));
+    console.log("CAHINSAWMAN: " + uri);
+     const uploadResp = await uploadToFirebase(uri,"userImages/"+currentUser.uid +".jpg",(v)=> console.log(v + " : " + uri));
      const imageStorage = getStorage();
-     const  imgRef = refS(imageStorage,"images/"+ currentUser.uid);
+     const  imgRef = refS(imageStorage,"userImages/"+ currentUser.uid + ".jpg");//to refresh local pfp localy
      // console.log("TTTTTT"+ imgRef);
      await getDownloadURL(imgRef).then((x)=>{
        setImageSource(x);
@@ -90,12 +91,19 @@ console.log(files)
   };
 
 return (
+  <View>
   <View style={[styles.container]}>
-    <TouchableOpacity onPress={selectImage}>
-    {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
-    {/* <Button title="Select Image" onPress={selectImage} /> */}
-    </TouchableOpacity>
+  <TouchableOpacity onPress={selectImage}>
+        {imageSource ? (
+          <Image source={{ uri: imageSource }} style={styles.image} />
+        ) : (
+          <Image source={tempIm2} style={styles.image} />
+        )}
+      </TouchableOpacity>
+    {/* <Button onPress={selectImage} title='hello'/> */}
   </View>
+  </View>
+  
 );
 };
 

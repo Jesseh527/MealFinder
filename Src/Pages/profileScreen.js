@@ -1,10 +1,23 @@
 // ProfieScreen.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { useCurrentUser  } from "../componets/tab"
-const ProfieScreen = ({ navigation }) => {
+import { getUserProfile } from '../componets/config';
+const ProfieScreen = ({ navigation }) => {  
+  const [userProfile, setUserProfile] = useState(null);
   const currentUser = useCurrentUser();
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (currentUser !== null) {
+        const profile = await getUserProfile(currentUser.uid);
+        setUserProfile(profile);
+        console.log(profile)
+      }
+    };
+
+    fetchUserProfile();
+  }, [currentUser]);
   return (
     <View style={styles.container}>
       {currentUser  == null ? (<View>
@@ -17,14 +30,16 @@ const ProfieScreen = ({ navigation }) => {
       <ProfilePicture  
           style={styles.profileImage} // Set the size of the profile picture
         />
-        <Text style={styles.username}>{currentUser.uid}</Text>
+        <Text style={styles.username}>
+              {userProfile ? userProfile.username : 'Loading...'}
+            </Text>
       </View>
       <View style={styles.bio}>
-        <Text style={styles.bioText}>Your bio goes here</Text>
+        <Text style={styles.bioText}>{userProfile ? userProfile.profile.bio : 'Loading...'}</Text>{/* impliment somthing to grab bio from RTDB, update or delete all users first  */ }
       </View>
       <View style={styles.stats}>
         
-        <View style={styles.statItem}>
+        <View style={styles.statItem}> 
           <Text style={styles.statValue}>100</Text>
           <Text style={styles.statLabel}>Posts</Text>
         </View>

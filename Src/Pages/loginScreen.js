@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { getDatabase, ref, set,update,onValue,data,get } from "firebase/database";
-import {FIREBASE_AUTH, db} from "../componets/config"
+import {FIREBASE_AUTH, db,createUserInRTDB,uploadToFirebase} from "../componets/config"
 import { async } from '@firebase/util';
 import {signInWithEmailAndPassword,createUserWithEmailAndPassword} from "firebase/auth";
 import { useCurrentUser  } from "../componets/tab"
@@ -37,10 +37,17 @@ const LoginScreen = () => {
 
   const handleSignup = async () => {
     setLoading(true);
-    try{7
-      const response = await createUserWithEmailAndPassword(auth,email,password)
+    try{
+      // const currentUser = useCurrentUser();
+      const response = await createUserWithEmailAndPassword(auth,email,password)//creates authentication
       console.log(response)
+      newUser = response.user;
       alert("check your email ");
+      
+     
+     
+      createUserInRTDB(newUser.uid, username, email);//stores in database
+      console.log("ONEPIEACE: "+ newUser.uid);
 
       
     }catch(error){

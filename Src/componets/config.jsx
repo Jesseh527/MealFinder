@@ -1,9 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {getDatabase} from "firebase/database";
+import {getDatabase,ref as refD, onValue,set,get} from "firebase/database";
 import {getAuth} from "firebase/auth";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable,listAll } from "firebase/storage";
+import { getDownloadURL, getStorage, ref as refS, uploadBytesResumable,listAll } from "firebase/storage";
 import { async } from "@firebase/util";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -33,12 +33,45 @@ export const listFiles= async () => {
   const storage = getStorage();
 
 // Create a reference under which you want to list
-const listRef = ref(storage, 'images');
+const listRef = refS(storage, 'images');
 const listResp = await listAll(listRef)
  return listResp.items
 }
 
+export const getUserProfile = async (userId) => {
+  try {
+    // Reference to the user's profile in the Realtime Database
+    const userRef = refD(db, `users/${userId}`); // Using the refD function for database reference
 
+    // Fetch the user profile data
+    const snapshot = await get(userRef); // Using the get function to fetch the data
+    const userProfile = snapshot.val();
+
+    return userProfile;
+  } catch (error) {
+    console.error('Error fetching user profile:', error.message);
+    throw error;
+  }
+};
+
+export function createUserInRTDB(userId, name, email) {//creats user in database
+  const db = getDatabase();
+  set(refD(db, 'users/' + userId), {
+    username: name,
+    email: email,
+    folowing: [],
+    profile:{
+      bio:"hello my name is " + name,
+      favorite_ingredients:[],
+      alergies:[],
+      hatted_favorite:[],  
+    }
+    
+  });
+  const tempImage =  require("../../assets/tempProfileImage.jpg");
+  // const newUserUri = tempImage.assets
+  // uploadToFirebase(tempImage, "userImage/"+ userId+".jpg",(v)=> console.log(v));
+}
 /**
  * 
  * @param {*} uri 
@@ -47,9 +80,8 @@ const listResp = await listAll(listRef)
 export const uploadToFirebase = async (uri,name,onProgress) => { ///npm install whatwg-fetch@3.6.2 if there is a range error [200,599]
   const fetchResponse=  await fetch(uri);
   const theBlob = await fetchResponse.blob();
-  // console.log(theBlob);
 
-const imageRef = ref( getStorage(), 'images/' +  name);
+const imageRef = refS( getStorage(),  name);
 
 
 const uploadTask = uploadBytesResumable(imageRef, theBlob);
