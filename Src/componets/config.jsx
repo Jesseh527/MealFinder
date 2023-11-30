@@ -53,6 +53,21 @@ export const getUserProfile = async (userId) => {
     throw error;
   }
 };
+export const getRecipInfo = async () => {
+  try {
+    // Reference to the user's profile in the Realtime Database
+    const postRef = refD(db, `recipe/`); // Using the refD function for database reference
+
+    // Fetch the user profile data
+    const snapshot = await get(postRef); // Using the get  function to fetch the data
+    const postProfile = snapshot.val();
+
+    return postProfile;
+  } catch (error) {
+    console.error('Error fetching recipe profile:', error.message);
+    throw error;
+  }
+};
 
 export function createUserInRTDB(userId, name, email) {//creats user in database
   const db = getDatabase();

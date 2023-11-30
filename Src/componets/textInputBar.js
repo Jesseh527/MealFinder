@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, View, StyleSheet } from 'react-native';
+import { TextInput, View, StyleSheet, Button, Touchable, TouchableOpacity,Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // If you're using Expo
 
 const TextInputBar = ({ onSearch }) => {
@@ -22,7 +22,11 @@ const TextInputBar = ({ onSearch }) => {
         value={text}
         onSubmitEditing={handleSearch}
       />
-      <Ionicons name="search" size={24} color="black" onPress={handleSearch} />
+      <TouchableOpacity><Ionicons name="search" size={24} color="black" onPress={handleSearch} /></TouchableOpacity>
+      <TouchableOpacity><Text> Add ingreedent </Text></TouchableOpacity>
+      <TouchableOpacity><Text> filters <Ionicons name="filter-outline" size={24} color="black"  /></Text></TouchableOpacity>
+
+      
     </View>
   );
 };

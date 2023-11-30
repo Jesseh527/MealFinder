@@ -23,7 +23,6 @@ useEffect(() => {
   const func = async () => {
     const imageStorage = getStorage();
     const  imgRef = refS(imageStorage,"userImages/"+ currentUser.uid+".jpg");
-    console.log("TTTTTT"+ imgRef);
     await getDownloadURL(imgRef).then((x)=>{
       setImageSource(x); 
       
