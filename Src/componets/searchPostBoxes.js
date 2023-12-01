@@ -51,11 +51,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#f2f2ea',
+    backgroundColor: 'white',
     borderRadius: 5,
     paddingHorizontal: 10,
     margin: 10,
     height: 150,
+    // Add shadow properties
+    elevation: 5, // for Android
+    shadowColor: '#000', // for iOS
+    shadowOffset: { width: 0, height: 2 }, // for iOS
+    shadowOpacity: 0.3, // for iOS
+    shadowRadius: 3, // for iOS
   },
   input: {
     flex: 1,
@@ -73,6 +79,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 3,
   },
+  
 });
 
 export default SearchPostBoxes;

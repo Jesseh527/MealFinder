@@ -15,17 +15,27 @@ const TextInputBar = ({ onSearch }) => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search..."
-        onChangeText={(text) => setText(text)}
-        value={text}
-        onSubmitEditing={handleSearch}
-      />
-      <TouchableOpacity><Ionicons name="search" size={24} color="black" onPress={handleSearch} /></TouchableOpacity>
-      <TouchableOpacity><Text> Add ingreedent </Text></TouchableOpacity>
-      <TouchableOpacity><Text> filters <Ionicons name="filter-outline" size={24} color="black"  /></Text></TouchableOpacity>
+      <View style = {{flexDirection: 'column'}}>
+        <View style = {{flexDirection:'row'}}>
+          <TextInput
+          style={styles.input}
+          placeholder="Search..."
+          onChangeText={(text) => setText(text)}
+          value={text}
+          onSubmitEditing={handleSearch}
+          
+        />
+        
+          <TouchableOpacity style ={{flex:0}}><Ionicons name="search" size={24} color="black" onPress={handleSearch} /></TouchableOpacity>
 
+        </View>
+      
+        <View style = {{flexDirection:'row'}}>
+          <TouchableOpacity><Text> Add ingreedent </Text></TouchableOpacity>
+          <TouchableOpacity><Text> filters <Ionicons name="filter-outline" size={16} color="black"  /></Text></TouchableOpacity>
+
+        </View>
+      </View>
       
     </View>
   );
@@ -43,6 +53,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     padding: 8,
+    backgroundColor:'white',
+    borderRadius: 200,
   },
 });
 
