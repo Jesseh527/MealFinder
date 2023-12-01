@@ -64,12 +64,7 @@ export default function MyTabs() {
         <Ionicons name="person-outline" color={color} size={size} />
       ),
     }}/>
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{
-     
-      tabBarIcon: ({ color, size }) => (
-        <Ionicons name="settings-outline" color={color} size={size} />
-      ),
-    }}/>
+      
      <Tab.Screen name="Recepi" component={RecepiScreen} options={{
       
       tabBarIcon: ({ color, size }) => (
@@ -81,6 +76,12 @@ export default function MyTabs() {
         <Ionicons name="log-in-outline" color={color} size={size} />
       ),
     }}/>
+    <Tab.Screen name="Settings" component={SettingsScreen} options={{
+     
+     tabBarIcon: ({ color, size }) => (
+       <Ionicons name="settings-outline" color={color} size={size} />
+     ),
+   }}/>
     
     </Tab.Navigator>
     </UserContext.Provider>

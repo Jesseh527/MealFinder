@@ -13,7 +13,7 @@ export default function HomeScreen() {
     setSearchResults([{ id: 1, name: 'Result 1' }, { id: 2, name: 'Result 2' }]);
   }
     return (  
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View >
         <Text>Home!</Text>
         <TextInputBar onSearch={handleSearch} />
       <FlatList

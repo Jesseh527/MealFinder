@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { TextInput, View, StyleSheet, Button, Touchable, TouchableOpacity,Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // If you're using Expo
+import { TextInput, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const TextInputBar = ({ onSearch }) => {
   const [text, setText] = useState('');
@@ -15,45 +15,53 @@ const TextInputBar = ({ onSearch }) => {
 
   return (
     <View style={styles.container}>
-      <View style = {{flexDirection: 'column'}}>
-        <View style = {{flexDirection:'row'}}>
+      <View style={styles.inputContainer}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TextInput
-          style={styles.input}
-          placeholder="Search..."
-          onChangeText={(text) => setText(text)}
-          value={text}
-          onSubmitEditing={handleSearch}
-          
-        />
-        
-          <TouchableOpacity style ={{flex:0}}><Ionicons name="search" size={24} color="black" onPress={handleSearch} /></TouchableOpacity>
+            style={styles.input}
+            placeholder="Search..."
+            onChangeText={(text) => setText(text)}
+            value={text}
+            onSubmitEditing={handleSearch}
+          />
 
+          <TouchableOpacity onPress={handleSearch}>
+            <Ionicons name="search" size={24} color="black" />
+          </TouchableOpacity>
         </View>
-      
-        <View style = {{flexDirection:'row'}}>
-          <TouchableOpacity><Text> Add ingreedent </Text></TouchableOpacity>
-          <TouchableOpacity><Text> filters <Ionicons name="filter-outline" size={16} color="black"  /></Text></TouchableOpacity>
 
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+          <TouchableOpacity>
+            <Text> Add ingredient </Text>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Text>
+              {' '}
+              filters <Ionicons name="filter-outline" size={16} color="black" />
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
-      
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
     borderRadius: 5,
     paddingHorizontal: 10,
     margin: 10,
   },
+  inputContainer: {
+    width: '100%', // Set width to 100% to take full width
+  },
   input: {
     flex: 1,
     padding: 8,
-    backgroundColor:'white',
+    backgroundColor: 'white',
     borderRadius: 200,
   },
 });

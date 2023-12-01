@@ -49,7 +49,7 @@ export default function RecepiScreen() {
 
 
   return (
-    <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+    <View style={{ flex: 1, justifyContent: 'flex-start' }}>
 
       <TextInputBar onSearch={setSearchQuery} />
       {/* <SearchPostBoxes posts= {searchResults[0]}/> */}
