@@ -37,7 +37,17 @@ const listRef = refS(storage, 'images');
 const listResp = await listAll(listRef)
  return listResp.items
 }
+export const generateUniqueId =  () => {
+  try{
 
+  const timestamp = new Date().getTime();
+  const randomNumber = Math.floor(Math.random() * 10000); // Adjust the range as needed
+  
+
+  return `${timestamp}-${randomNumber}`;
+  }catch(error){console.error('Error generating numbers', error.message);
+  throw error;}
+};
 export const getUserProfile = async (userId) => {
   try {
     // Reference to the user's profile in the Realtime Database
@@ -68,7 +78,21 @@ export const getRecipInfo = async () => {
     throw error;
   }
 };
-
+export function createNewPost(title,cooktime,preptime,description,directions,ingredients,userID,newPostID){
+  
+  const db = getDatabase();
+  set(refD(db, 'recipe/' + newPostID), {
+    title:title,
+    author:userID,
+    cooktime:cooktime,
+    preptime:preptime,
+    description:description,
+    directions:directions,
+    ingredients:ingredients,
+    image:"recipeImages/" + newPostID + ".jpg"
+    
+  });
+}
 export function createUserInRTDB(userId, name, email) {//creats user in database
   const db = getDatabase();
   set(refD(db, 'users/' + userId), {
