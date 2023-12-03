@@ -10,6 +10,7 @@ import HomeScreen from '../Pages/homeScreen';
 import SettingsScreen from '../Pages/settingsScreen';
 import LoginScreen from '../Pages/loginScreen';
 import ProfileScreen from '../Pages/profileScreen';
+import AddFoodScreen from '../Pages/addFoodScreen';
 import { useState,useEffect } from 'react';
 import { onAuthStateChanged} from '@firebase/auth';
 import { User } from '@firebase/auth';
@@ -65,7 +66,7 @@ export default function MyTabs() {
       ),
     }}/>
       
-     <Tab.Screen name="Recepi" component={RecepiScreen} options={{
+     <Tab.Screen name="Recipe" component={RecepiScreen} options={{
       
       tabBarIcon: ({ color, size }) => (
         <Ionicons name="fast-food-outline" color={color} size={size} />
@@ -78,6 +79,12 @@ export default function MyTabs() {
     }}/>
     <Tab.Screen name="Settings" component={SettingsScreen} options={{
      
+     tabBarIcon: ({ color, size }) => (
+       <Ionicons name="settings-outline" color={color} size={size} />
+     ),
+   }}/>
+   <Tab.Screen name="Add-Recipe" component={AddFoodScreen} options={{
+     tabBarButton:()=> null,
      tabBarIcon: ({ color, size }) => (
        <Ionicons name="settings-outline" color={color} size={size} />
      ),

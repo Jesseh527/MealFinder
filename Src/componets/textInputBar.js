@@ -62,7 +62,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 8,
     backgroundColor: 'white',
-    borderRadius: 200,
+    borderRadius: 200, 
+    elevation: 5, // for Android
+    shadowColor: '#000', // for iOS
+    shadowOffset: { width: 0, height: 2 }, // for iOS
+    shadowOpacity: 0.3, // for iOS
+    shadowRadius: 3, // for iOS
   },
 });
 
