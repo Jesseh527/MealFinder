@@ -78,7 +78,7 @@ export const getRecipInfo = async () => {
     throw error;
   }
 };
-export function createNewPost(title,cooktime,preptime,description,directions,ingredients,userID,newPostID){
+export function createNewPost(title,cooktime,preptime,description,directions,ingredients,userID,newPostID,caloriePerServing,servingSize,totalServings){
   
   const db = getDatabase();
   set(refD(db, 'recipe/' + newPostID), {
@@ -89,7 +89,12 @@ export function createNewPost(title,cooktime,preptime,description,directions,ing
     description:description,
     directions:directions,
     ingredients:ingredients,
-    image:"recipeImages/" + newPostID + ".jpg"
+    image:newPostID + ".jpg",
+    averageRating:0,
+    ratings:[],
+    caloriePerServing:caloriePerServing,
+    servingSize:servingSize,
+    totalServings:servingSize
     
   });
 }

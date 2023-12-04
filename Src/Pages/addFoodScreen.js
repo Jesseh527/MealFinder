@@ -7,22 +7,41 @@ import { TextInputMask } from 'react-native-masked-text';
 import * as ImagePicker from 'expo-image-picker';
 import { useCurrentUser } from '../componets/tab';
 import { uploadToFirebase,generateUniqueId,createNewPost } from '../componets/config';
+// import { Alert } from 'react-native-alert';
 
 export default function AddFoodScreen({ navigation }) {
   const currentUser = useCurrentUser(); // Replace with your actual user check
   const tempImage = require("../../assets/imageplaceholder.png");
   const uploadImagePlaceHolder = require("../../assets/uploadImagePlaceHolder.png");
   const [postName, setPostName] = useState('');
-  const [numReviews, setNumReviews] = useState();
   const [imageSource, setImageSource] = useState(uploadImagePlaceHolder);
   const [cookTimeValue, setCookTimeValue] = useState(0);
   const [prepTimeValue, setPrepTimeValue] = useState(0);
+  const [caloriePerServing, setCaloriePerServing] = useState(0);
+  const [servingSize, setServingSize] = useState('');
+  const [totalServing,setTotalServings] = useState(0)
   const [description, setDescription] = useState('');
   const [directions, setDirections] = useState('');
   const [ingredient, setIngredient] = useState('');
   const [amount, setAmount] = useState('');
   const [ingredientList, setIngredientList] = useState([]);
-    
+  
+  
+  const  resetRecipieConst = ()=>{
+    setPostName('');
+  setImageSource(uploadImagePlaceHolder);
+  setCookTimeValue(0);
+  setPrepTimeValue(0);
+  setCaloriePerServing(0);
+  setServingSize('');
+  setTotalServings(0);
+  setDescription('');
+  setDirections('');
+  setIngredient('');
+  setAmount('');
+  setIngredientList([]);
+
+  }
   const handleCookInputChange = (text) => {
     const numericText = text.replace(/[^0-9]/g, '');
     const truncatedText = numericText.slice(0, 4);
@@ -55,18 +74,36 @@ export default function AddFoodScreen({ navigation }) {
     setIngredientList(updatedList);
   };
   const uploadRecipe = async () => {
-    try{
-        console.log("begin");
-      
-        const newPostID= generateUniqueId()
-        console.log(newPostID );
-        const uploadResp = await uploadToFirebase(imageSource.uri,"recipeImages/"+newPostID +".jpg",(v)=> console.log(v + " : " + imageSource));
-        console.log('success:'+uploadResp)
-        createNewPost(postName,cookTimeValue,prepTimeValue,description,directions,ingredientList,currentUser.uid,newPostID)
-        
-    }
-    catch(error){}
-  }
+    Alert.alert('Confirm', 'Are you sure you want to submit this recipe?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Recipe submission canceled!'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            console.log('begin');
+  
+            const newPostID = generateUniqueId();
+            console.log(newPostID);
+            const uploadResp = await uploadToFirebase(imageSource.uri, 'recipeImages/' + newPostID + '.jpg', (v) => console.log(v + ' : ' + imageSource));
+            console.log('success:' + uploadResp);
+            createNewPost(postName, cookTimeValue, prepTimeValue, description, directions, ingredientList, currentUser.uid, newPostID, caloriePerServing, servingSize, totalServing);
+            resetRecipieConst();
+  
+            // Show success alert
+            Alert.alert('Success', 'Recipe submitted successfully!');
+          } catch (error) {
+            // Handle any errors here
+            console.error('Error:', error);
+          }
+        },
+      },
+    ]);
+  };
+
   const selectImage = async () => {
     try {
       const camResponse = await ImagePicker.launchImageLibraryAsync({
@@ -132,8 +169,41 @@ export default function AddFoodScreen({ navigation }) {
                   maxLength={4}
                 />
               </View>
+              
+             
             </View>
           </View>
+          <View style={{ flexDirection: 'row' }}>
+                <Text style={{ paddingTop: 10 }}>calorie Per Serving </Text>
+                <TextInput
+                  style={styles.numInput}
+                  value={caloriePerServing}
+                  onChangeText={setCaloriePerServing}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  maxLength={4}
+                />
+              </View>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ paddingTop: 10 }}>serving size             </Text>
+                <TextInput
+                  style={styles.numInput}
+                  value={servingSize}
+                  onChangeText={setServingSize}
+                  placeholder="serving size"
+                />
+              </View>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ paddingTop: 10 }}>total servingss        </Text>
+                <TextInput
+                  style={styles.numInput}
+                  value={totalServing}
+                  onChangeText={setTotalServings}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  maxLength={4}
+                />
+              </View>
           <TextInput
             style={styles.longInput}
             value={description}
@@ -151,8 +221,9 @@ export default function AddFoodScreen({ navigation }) {
             numberOfLines={4}
           />
           <View>
+          <Text>Ingredients:</Text>
             <View style={{ flexDirection: 'row' }}>
-              <Text>Ingredients</Text>
+              
               <TextInput
                 placeholder="Name"
                 value={ingredient}
@@ -177,6 +248,7 @@ export default function AddFoodScreen({ navigation }) {
       </View>
                 
               ))}
+              <Button title='PUBLISH RECIPIE' onPress={uploadRecipe}></Button>
               <View style = {{height:100, width:100}}></View>
             </View>
             <Button title='PUBLISH RECIPIE' onPress={uploadRecipe}></Button>
