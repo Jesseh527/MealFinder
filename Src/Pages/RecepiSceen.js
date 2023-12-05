@@ -12,7 +12,30 @@ export default function RecepiScreen() {
 
   const handleSearch = async (query) => {
     try {
-      // ... (your existing search logic)
+      const recipes = await getRecipInfo();
+      console.log(recipes)
+      if (!recipes) {
+        console.error('Recipe data is undefined or null');
+        return;
+      }
+  
+      let filteredRecipes;
+  
+      if (query.trim() === '') {
+        // If the query is blank, show all recipes
+        filteredRecipes = Object.values(recipes);
+      } else {
+        // Filter recipes based on the search query
+        filteredRecipes = Object.values(recipes).filter(
+          (recipe) =>
+            (recipe.title?.toLowerCase()?.includes(query.toLowerCase()) || '') ||
+            (recipe.description?.toLowerCase()?.includes(query.toLowerCase()) || '')
+        );
+      }
+  
+      // Update the state with the filtered results
+      setSearchResults(filteredRecipes);
+      console.log(filteredRecipes)
     } catch (error) {
       console.error('Error handling search:', error.message);
     }
