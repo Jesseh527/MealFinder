@@ -45,7 +45,7 @@ const SearchPostBoxes = ({ post, navigation }) => {
         </View>
         <Text>{post.description}</Text>
       </View>
-      <TouchableOpacity style ={{position: "absolute", bottom: 0, right: 0}} onPress={()=> navigation.navigate('home')}>
+      <TouchableOpacity style ={{position: "absolute", bottom: 0, right: 0}} onPress={()=> navigation.navigate('Recipie-Profile-name',{post})}>
         <Text style={{  color: "#24A0ED" }}>more...</Text>
       </TouchableOpacity>
     </View>

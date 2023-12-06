@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Text, View,Image,Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Dimensions, useWindowDimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import RecepiScreen from '../Pages/RecepiSceen';
@@ -11,6 +12,7 @@ import SettingsScreen from '../Pages/settingsScreen';
 import LoginScreen from '../Pages/loginScreen';
 import ProfileScreen from '../Pages/profileScreen';
 import AddFoodScreen from '../Pages/addFoodScreen';
+import FoodProfile from '../componets/foodProfile'
 import { useState,useEffect } from 'react';
 import { onAuthStateChanged} from '@firebase/auth';
 import { User } from '@firebase/auth';
@@ -25,6 +27,7 @@ const Tab = createBottomTabNavigator();
 
 export default function MyTabs() {
    const [currentUser, setUser] = useState(null);//maybe add back <User | null> 
+   const windowWidth = useWindowDimensions().width;
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (authUser) => {
@@ -89,6 +92,22 @@ export default function MyTabs() {
        <Ionicons name="settings-outline" color={color} size={size} />
      ),
    }}/>
+   <Tab.Screen
+          name="Recipie-Profile-name"
+          component={FoodProfile}
+          options={({ route }) => ({
+            tabBarButton: () => null,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="settings-outline" color={color} size={size} />
+            ),
+            headerTitle: route.params?.post?.title || 'Recipe Profile',
+            headerTitleStyle: {
+              maxWidth: windowWidth * 0.5     , // Adjust the percentage as needed
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            },
+          })}
+        />
     
     </Tab.Navigator>
     </UserContext.Provider>

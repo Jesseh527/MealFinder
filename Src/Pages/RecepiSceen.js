@@ -54,7 +54,7 @@ export default function RecepiScreen(navigation) {
         style={{ flex: 1 }} // Make sure FlatList takes up all available space
         data={searchResults}
         renderItem={({ item }) => {
-          return <SearchPostBoxes post={item} navigation={navigation} />;
+          return <SearchPostBoxes post={item} navigation={navigation.navigation} />;
         }}
         keyExtractor={keyExtractor}
       />
