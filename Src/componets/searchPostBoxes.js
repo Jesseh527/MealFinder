@@ -2,12 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image } from 'react-native';
 import {ref as refS,uploadBytes,getDownloadURL, getStorage} from "firebase/storage";
+import { TouchableOpacity } from 'react-native';
+// import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
-const SearchPostBoxes = ({ post }) => {
+
+const SearchPostBoxes = ({ post, navigation }) => {
   const tempImage = require("../../assets/imageplaceholder.png");
   const [imageUrl, setImageUrl] = useState(null);
   const [numReviews, setNumReviews] = useState(0);
-
+  // const navigation = useNavigation();
 
   const getPostImage = async (uri) => {
     try {
@@ -42,7 +45,9 @@ const SearchPostBoxes = ({ post }) => {
         </View>
         <Text>{post.description}</Text>
       </View>
-      <Text style={{ position: "absolute", bottom: 0, right: 0, color: "#24A0ED" }}>more...</Text>
+      <TouchableOpacity style ={{position: "absolute", bottom: 0, right: 0}} onPress={()=> navigation.navigate('home')}>
+        <Text style={{  color: "#24A0ED" }}>more...</Text>
+      </TouchableOpacity>
     </View>
   );
 };

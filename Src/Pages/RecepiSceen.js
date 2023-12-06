@@ -6,7 +6,7 @@ import SearchPostBoxes from '../componets/searchPostBoxes';
 import { getRecipInfo } from '../componets/config';
 // ... (your imports)
 
-export default function RecepiScreen() {
+export default function RecepiScreen(navigation) {
   const [searchResults, setSearchResults] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -54,7 +54,7 @@ export default function RecepiScreen() {
         style={{ flex: 1 }} // Make sure FlatList takes up all available space
         data={searchResults}
         renderItem={({ item }) => {
-          return <SearchPostBoxes post={item} />;
+          return <SearchPostBoxes post={item} navigation={navigation} />;
         }}
         keyExtractor={keyExtractor}
       />
