@@ -104,7 +104,7 @@
               console.log('begin');
     
               const newPostID = generateUniqueId();
-              console.log(newPostID);
+              
               const uploadResp = await uploadToFirebase(imageSource.uri, 'recipeImages/' + newPostID + '.jpg', (v) => console.log(v + ' : ' + imageSource));
               console.log('success:' + uploadResp);
               createNewPost(postName, cookTimeValue, prepTimeValue, description, directions, ingredientList, currentUser.uid, newPostID, caloriePerServing, servingSize, totalServing);

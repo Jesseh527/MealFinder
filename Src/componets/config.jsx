@@ -29,6 +29,23 @@ export const storage = getStorage();
 export const db = getDatabase(app);
 export const FIREBASE_AUTH = getAuth(app);
 
+export const getUserFromID = async (userID) =>{// returns username from userID, may change to just return the userprofile later
+  const userRef = refD(db, `users/${userID}`);
+  try {
+    // Reference to the user's profile in the Realtime Database
+    const userRef = refD(db, `users/${userID}`); // Using the refD function for database reference
+
+    // Fetch the user profile data
+    const snapshot = await get(userRef); // Using the get function to fetch the data
+    const userProfile = snapshot.val();
+    console.log("wowzewr"+ userProfile.username);
+    return userProfile;
+    
+  } catch (error) {
+    console.error('Error geting Username:', error.message);
+    throw error;
+  }
+}
 export const listFiles= async () => {
   const storage = getStorage();
 
@@ -94,7 +111,7 @@ export function createNewPost(title,cooktime,preptime,description,directions,ing
     ratings:[],
     caloriePerServing:caloriePerServing,
     servingSize:servingSize,
-    totalServings:servingSize
+    totalServings:totalServings
     
   });
 }
