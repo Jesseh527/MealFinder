@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, ScrollView, StyleSheet,TouchableOpacity } from 'react-native';
+import { Text, View, Image, ScrollView, StyleSheet,TouchableOpacity, Alert } from 'react-native';
 import { ref as refS, getDownloadURL, getStorage } from 'firebase/storage';
 import { getUserProfile } from './config';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useCurrentUser  } from "../componets/tab"
+import { updateUserRating, updatePostRating,db } from './config';
+import {getDatabase,ref as refD, onValue,set,get,update} from "firebase/database";
 
-export default function FoodProfile({ route }) {
+
+export default function FoodProfile({ route,navigation }) {
   const { post } = route.params;
   const tempImage = require('../../assets/imageplaceholder.png');
   const [imageUrl, setImageUrl] = useState(null);
   const [numReviews, setNumReviews] = useState(0);
   const [authorOfPost, setAuthorOfPost] = useState([]);
   const [userRating, setUserRating] = useState(0);
+  const currentUser = useCurrentUser();
+  const [postAverageRating, setPostAverageRating] = useState(0);
+
 
   const getPostImage = async (uri) => {
     try {
@@ -23,16 +30,31 @@ export default function FoodProfile({ route }) {
       console.error('Error downloading Post Image ' + e.message);
     }
   };
+  const getUserRating = () =>{
+    if(currentUser == null){
+      return 0
+    }
+    const userId = currentUser.uid;
+  const postRatings = post.ratings || {};
 
+  // Check if the user has rated the post
+  if (postRatings.hasOwnProperty(userId)) {
+    return postRatings[userId];
+  } else {
+    return 0;
+  }
+    
+  }
   useEffect(() => {
     getPostImage(post.image);
     const reviewsCount = Object.keys(post.ratings || {}).length;
     setNumReviews(reviewsCount);
     const postAuthor = getUserProfile(post.author);
     setAuthorOfPost(postAuthor);
-    //match userid to post rating if it dosnt exsist add/update it 
-    // const userRating = getUserRating(); // Implement this function
-    // setUserRating(userRating);
+    setPostAverageRating(post.averageRating || 0);
+   
+    const userRating = getUserRating(); 
+    setUserRating(userRating);
     
   }, [post.image, post.ratings]);
 
@@ -47,12 +69,60 @@ export default function FoodProfile({ route }) {
       );
     });
   };
-  const handleStarPress = (rating) => {
-    // Logic to update the rating in the database
-    // You may need to use Firebase's database functions for this
-    // For example: updateRating(postId, userId, rating);
-    setUserRating(rating);
+  const handleStarPress = async (rating) => {
+    if (!currentUser) {
+      // If the user is not logged in, show an alert
+      Alert.alert(
+        'Login Required',
+        'You need to log in to rate this post. Do you want to log in?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Log In',
+            onPress: () => {
+              navigation.navigate('Login');
+            },
+          },
+        ]
+      );
+    } else {
+      try {
+        // Update the user's rating in the database
+        console.log('1')// for debuuging purposes
+        // console.log(currentUser.uid);
+        // console.log(post.postID);
+        // console.log(post.key);
+        await updateUserRating(currentUser.uid, post.postID, rating);
+        console.log('2')
+        // Update the post's average rating in the database
+        await updatePostRating(post.postID);
+        console.log('3')
+        // Update the local state with the new user rating
+        const updatedPostRef = refD(db, `recipe/${post.postID}`);
+        const updatedPostSnapshot = await get(updatedPostRef);
+        const updatedPostData = updatedPostSnapshot.val();
+  
+        // Update the local state with the new user rating and post data
+        setUserRating(rating);
+        setNumReviews(Object.keys(updatedPostData.ratings || {}).length);
+        setPostAverageRating(updatedPostData.averageRating);
+        // You can update other relevant state variables as needed
+        // ...
+  
+        // Optionally, you can fetch the updated post data and update the state
+        // with the new average rating and number of reviews
+        // ...
+
+      } catch (error) {
+        console.error('Error updating ratings:', error.message);
+        // Handle the error as needed
+      }
+    }
   };
+
 
   const renderStars = () => {
     const stars = [];
@@ -82,14 +152,16 @@ export default function FoodProfile({ route }) {
           <View style={{ flexDirection: 'column' }}>
             <Image source={imageUrl ? { uri: imageUrl } : tempImage} style={{ flex: 2, width: 200, height: 100 }} />
             <Text>food profile!{post.title}</Text>
-            <Text>by: {authorOfPost._j ? authorOfPost._j.username : 'Loading...'}</Text>
+            <TouchableOpacity onPress={()=> navigation.navigate('User-Profile-name',{authorOfPost})}>
+              <Text>by: {authorOfPost._j ? authorOfPost._j.username : 'Loading...'}</Text>
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.container}>
           <Text style={styles.headerText}>Rating:</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ flexDirection: 'row' }}>{renderStars()}</View>
-            <Text style={{ marginLeft: 10 }}>{post.averageRating.toFixed(2)}/5</Text>
+            <Text style={{ marginLeft: 10 }}>{postAverageRating.toFixed(2)}/5</Text>
             <Text style={{ marginLeft: 10 }}>{numReviews} reviews</Text>
           </View>
         </View>

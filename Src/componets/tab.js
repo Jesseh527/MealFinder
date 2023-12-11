@@ -13,6 +13,7 @@ import LoginScreen from '../Pages/loginScreen';
 import ProfileScreen from '../Pages/profileScreen';
 import AddFoodScreen from '../Pages/addFoodScreen';
 import FoodProfile from '../componets/foodProfile'
+import OtherUSerProfile from '../Pages/OtherUserProfile';
 import { useState,useEffect } from 'react';
 import { onAuthStateChanged} from '@firebase/auth';
 import { User } from '@firebase/auth';
@@ -92,6 +93,7 @@ export default function MyTabs() {
        <Ionicons name="settings-outline" color={color} size={size} />
      ),
    }}/>
+   
    <Tab.Screen
           name="Recipie-Profile-name"
           component={FoodProfile}
@@ -101,6 +103,22 @@ export default function MyTabs() {
               <Ionicons name="settings-outline" color={color} size={size} />
             ),
             headerTitle: route.params?.post?.title || 'Recipe Profile',
+            headerTitleStyle: {
+              maxWidth: windowWidth * 0.5     , // Adjust the percentage as needed
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            },
+          })}
+        />
+        <Tab.Screen
+          name="User-Profile-name"
+          component={OtherUSerProfile}
+          options={({ route }) => ({
+            tabBarButton: () => null,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="settings-outline" color={color} size={size} />
+            ),
+            headerTitle: route.params?.authorOfPost?._j?.username || 'User-Profile',
             headerTitleStyle: {
               maxWidth: windowWidth * 0.5     , // Adjust the percentage as needed
               overflow: 'hidden',

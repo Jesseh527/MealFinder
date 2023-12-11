@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {getDatabase,ref as refD, onValue,set,get} from "firebase/database";
+import {getDatabase,ref as refD, onValue,set,get,update} from "firebase/database";
 import {getAuth} from "firebase/auth";
 import { getDownloadURL, getStorage, ref as refS, uploadBytesResumable,listAll } from "firebase/storage";
 import { async } from "@firebase/util";
@@ -98,12 +98,13 @@ export function createNewPost(title,cooktime,preptime,description,directions,ing
   
   const db = getDatabase();
   set(refD(db, 'recipe/' + newPostID), {
+    postID: newPostID,
     title:title,
     author:userID,
     cooktime:cooktime,
     preptime:preptime,
     description:description,
-    directions:directions,
+    directions:directions,  
     ingredients:ingredients,
     image:newPostID + ".jpg",
     averageRating:0,
@@ -118,6 +119,7 @@ export function createUserInRTDB(userId, name, email) {//creats user in database
   const db = getDatabase();
   set(refD(db, 'users/' + userId), {
     username: name,
+    userID:userId,
     email: email,
     folowing: [],
     profile:{
@@ -171,3 +173,42 @@ uploadTask.on(
 })
 
 }
+
+
+export const updateUserRating = async (userId, postId, rating) => {
+  const postRef = refD(db, `recipe/${postId}/ratings/${userId}`);
+
+  try {
+    // Update the user's rating for the specific post
+    await set(postRef, rating);
+  } catch (error) {
+    console.error('Error updating user rating:', error.message);
+    throw error;
+  }
+};
+
+export const updatePostRating = async (postId) => {
+  const postRef = refD(db, `recipe/${postId}`);
+
+  try {
+    const postSnapshot = await get(postRef);
+    const post = postSnapshot.val();
+
+    if (!post) {
+      console.error('Post not found');
+      return;
+    }
+
+    const ratings = Object.values(post.ratings || {});
+    const averageRating =
+      ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+
+    // Update only the averageRating property
+    await update(postRef, { averageRating });
+  } catch (error) {
+    console.error('Error updating post rating:', error.message);
+    throw error;
+  }
+};
+
+
