@@ -13,7 +13,7 @@ export default function RecepiScreen(navigation) {
   const handleSearch = async (query) => {
     try {
       const recipes = await getRecipInfo();
-      console.log(recipes)
+      // console.log(recipes)
       if (!recipes) {
         console.error('Recipe data is undefined or null');
         return;
@@ -35,7 +35,7 @@ export default function RecepiScreen(navigation) {
   
       // Update the state with the filtered results
       setSearchResults(filteredRecipes);
-      console.log(filteredRecipes)
+      // console.log(filteredRecipes)
     } catch (error) {
       console.error('Error handling search:', error.message);
     }

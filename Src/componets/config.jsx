@@ -38,7 +38,6 @@ export const getUserFromID = async (userID) =>{// returns username from userID, 
     // Fetch the user profile data
     const snapshot = await get(userRef); // Using the get function to fetch the data
     const userProfile = snapshot.val();
-    console.log("wowzewr"+ userProfile.username);
     return userProfile;
     
   } catch (error) {
