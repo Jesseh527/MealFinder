@@ -10,7 +10,7 @@ import { storage } from '../componets/config';
 import { ref as refD,set } from 'firebase/database';
 
 
-const ProfilePicture = () => {
+const ProfilePicture = (profileID) => {
   // const [cameraPermissions, requestPermission] = ImagePicker.useCameraPermissions();
 
   const currentUser = useCurrentUser();
@@ -22,10 +22,12 @@ const ProfilePicture = () => {
 useEffect(() => {
   const func = async () => {
     const imageStorage = getStorage();
-    const  imgRef = refS(imageStorage,"userImages/"+ currentUser.uid+".jpg");
+    console.log("profileID:")
+    console.log(profileID.profileID)
+    const  imgRef = refS(imageStorage,"userImages/"+ profileID.profileID+".jpg");
     await getDownloadURL(imgRef).then((x)=>{
       setImageSource(x); 
-      
+       
     })
   }
   listFiles().then((listResp)=>{
@@ -50,6 +52,14 @@ console.log(files)
     // if (!granted){
     //   return;
     // }
+    if(currentUser == null){
+      console.log('current user is not this profiles user');
+      return;
+    }
+    if(currentUser.uid != profileID.profileID){
+      console.log('current user is not this profiles user');
+      return;
+    }
     try{
     const camResponse = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,

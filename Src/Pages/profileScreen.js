@@ -27,7 +27,7 @@ const ProfieScreen = ({ navigation }) => {
 
       </View>):( <View style={styles.container}>
       <View style={styles.header}>
-      <ProfilePicture  
+      <ProfilePicture  profileID = {currentUser.uid}
           style={styles.profileImage} // Set the size of the profile picture
         />
         <Text style={styles.username}>

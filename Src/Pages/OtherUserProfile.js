@@ -10,6 +10,7 @@ const OtherUSerProfile = ({ route,navigation }) => {
   console.log("adasdsaddsa")
   console.log(route.params.authorOfPost._j);
   const  user = route.params.authorOfPost._j;
+  const userId = route.params.authorOfPost._j.userID;
   console.log(user);
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -25,7 +26,7 @@ const OtherUSerProfile = ({ route,navigation }) => {
   return (
    <View style={styles.container}>
       <View style={styles.header}>
-      <ProfilePicture  
+      <ProfilePicture  profileID = {userId}
           style={styles.profileImage} // cahnge or make new file for Profile picture
         />
         <Text style={styles.username}>
