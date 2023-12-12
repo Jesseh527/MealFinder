@@ -212,3 +212,26 @@ export const updatePostRating = async (postId) => {
 };
 
 
+export const getUserPosts = async (userId) => {
+  try {
+    // Reference to the recipes in the Realtime Database
+    const postRef = refD(db, `recipe/`);
+
+    // Fetch all posts
+    const snapshot = await get(postRef);
+    const allPosts = snapshot.val();
+
+    // Filter posts based on the author's ID
+    const userPosts = Object.entries(allPosts || {}).reduce((filteredPosts, [postId, post]) => {
+      if (post.author === userId) {
+        filteredPosts[postId] = post;
+      }
+      return filteredPosts;
+    }, {});
+
+    return userPosts;
+  } catch (error) {
+    console.error('Error fetching user posts:', error.message);
+    throw error;
+  }
+};

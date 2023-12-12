@@ -1,11 +1,13 @@
 // ProfieScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet,FlatList } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { useCurrentUser  } from "../componets/tab"
-import { getUserProfile } from '../componets/config';
+import { getUserProfile,getUserPosts } from '../componets/config';
 const ProfieScreen = ({ navigation }) => {  
   const [userProfile, setUserProfile] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+
   const currentUser = useCurrentUser();
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -13,6 +15,9 @@ const ProfieScreen = ({ navigation }) => {
         const profile = await getUserProfile(currentUser.uid);
         setUserProfile(profile);
         console.log(profile)
+        const posts = await getUserPosts(currentUser.uid);//otherUserProfile
+        setUserPosts(posts);
+        console.log(posts);
       }
     };
 
@@ -53,16 +58,35 @@ const ProfieScreen = ({ navigation }) => {
         </View>
       </View> 
       <View style={styles.postsContainer}>
-        <View style={[styles.post, {backgroundColor: "blue"}]}>
-          {/* Your post content goes here */}
-        </View>
-        <View style={styles.post}>
-          {/* Your post content goes here */}
-        </View>
-        <View style={styles.post}>
-          {/* Your post content goes here */}
-        </View>
-        {/* Add more post boxes as needed */}
+      <FlatList
+  data={userPosts}
+  keyExtractor={(item) => item.postID}
+  renderItem={({ item }) => {
+    // Get an array of postIDs from the item object
+    const postIDs = Object.keys(item);
+
+    // Find the index of the current postID
+    const currentIndex = postIDs.indexOf(item.postID);
+
+    // Get the next postID if it exists
+    const nextPostID = postIDs[currentIndex + 1];
+
+    // Get the next child based on the next postID
+    const nextChild = nextPostID ? item[nextPostID] : null;
+
+    // Access postID from the next child
+    const nextPostIDValue = nextChild ? nextChild.postID : null;
+
+    return (
+      <View style={styles.post}>
+        <Text>Hello {item.postID}</Text>
+        <Text>Next Post ID: {nextPostIDValue}</Text>
+        {/* Your post content goes here */}
+      </View>
+    );
+  }}
+  numColumns={3}
+/>
       </View>
     </View>) }
       
