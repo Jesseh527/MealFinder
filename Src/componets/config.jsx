@@ -221,17 +221,31 @@ export const getUserPosts = async (userId) => {
     const snapshot = await get(postRef);
     const allPosts = snapshot.val();
 
-    // Filter posts based on the author's ID
-    const userPosts = Object.entries(allPosts || {}).reduce((filteredPosts, [postId, post]) => {
-      if (post.author === userId) {
-        filteredPosts[postId] = post;
-      }
-      return filteredPosts;
-    }, {});
+    // Filter post IDs based on the author's ID
+    const userPostIds = Object.keys(allPosts || []).filter(postId => {
+      const post = allPosts[postId];
+      return post && post.author === userId; 
+    });
 
-    return userPosts;
+    return userPostIds;
   } catch (error) {
     console.error('Error fetching user posts:', error.message);
+    throw error;
+  }
+};
+export const getRecipInfoFromPostId = async (id) => {
+  try {
+    // Reference to the user's profile in the Realtime Database
+    const postRef = refD(db, `recipe/`+id); // Using the refD function for database reference
+
+    // Fetch the user profile data
+    const snapshot = await get(postRef); // Using the get  function to fetch the data
+    const postProfile = snapshot.val();
+    console.log('TTTTTTTTTTTTTTTTT');
+    console.log(postProfile);
+    return postProfile;
+  } catch (error) {
+    console.error('Error fetching recipe profile:', error.message);
     throw error;
   }
 };

@@ -6,6 +6,7 @@ import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom
 import { Dimensions, useWindowDimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+
 import RecepiScreen from '../Pages/RecepiSceen';
 import HomeScreen from '../Pages/homeScreen';
 import SettingsScreen from '../Pages/settingsScreen';
@@ -14,6 +15,7 @@ import ProfileScreen from '../Pages/profileScreen';
 import AddFoodScreen from '../Pages/addFoodScreen';
 import FoodProfile from '../componets/foodProfile'
 import OtherUSerProfile from '../Pages/OtherUserProfile';
+import FoodProfile2 from './foodProfileFromUserProfile';
 import { useState,useEffect } from 'react';
 import { onAuthStateChanged} from '@firebase/auth';
 import { User } from '@firebase/auth';
@@ -110,15 +112,31 @@ export default function MyTabs() {
             },
           })}
         />
-        <Tab.Screen
-          name="User-Profile-name"
-          component={OtherUSerProfile}
+    <Tab.Screen
+      name="User-Profile-name"
+      component={OtherUSerProfile}
+      options={({ route }) => ({
+        tabBarButton: () => null,
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="settings-outline" color={color} size={size} />
+        ),
+        headerTitle: route.params?.authorOfPost?._j?.username || 'User-Profile',
+        headerTitleStyle: {
+          maxWidth: windowWidth * 0.5     , // Adjust the percentage as needed
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        },
+      })}
+    />
+    <Tab.Screen
+          name="Recipie-Profile-name2"
+          component={FoodProfile2}
           options={({ route }) => ({
             tabBarButton: () => null,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="settings-outline" color={color} size={size} />
             ),
-            headerTitle: route.params?.authorOfPost?._j?.username || 'User-Profile',
+            headerTitle: route.params?.post?.title || 'Recipe Profile',
             headerTitleStyle: {
               maxWidth: windowWidth * 0.5     , // Adjust the percentage as needed
               overflow: 'hidden',

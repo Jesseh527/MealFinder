@@ -1,74 +1,74 @@
-// searchPostBoxes.js
+//profilePost.js
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
-import {ref as refS,uploadBytes,getDownloadURL, getStorage} from "firebase/storage";
-import { TouchableOpacity } from 'react-native';
-// import { useNavigation } from '@react-navigation/native'; // Import useNavigation
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { ref as refS, getDownloadURL, getStorage } from 'firebase/storage';
+import { getRecipInfo } from './config';
 
-
-const profilePost = ({ post, navigation }) => {
+const ProfilePost = ({ postId, navigation }) => {
+  // Placeholder image for testing
   const tempImage = require("../../assets/imageplaceholder.png");
+
+  // State to store the image URL
   const [imageUrl, setImageUrl] = useState(null);
-  const [numReviews, setNumReviews] = useState(0);
 
-  // const navigation = useNavigation();
+  // Function to navigate to the post details screen
+  const navToPost = async (id) => {
+    try {
+      const recipes = await getRecipInfo(id);
 
+      if (!recipes) {
+        console.error('Recipe data is undefined or null');
+        return;
+      }
+
+      const matchingRecipe = recipes[id];
+      navigation.navigate('Recipie-Profile-name2', { post: matchingRecipe });
+    } catch (error) {
+      console.error('Error handling search:', error.message);
+    }
+  };
+
+  // Function to fetch and set the image URL
   const getPostImage = async (uri) => {
     try {
       const imageStorage = getStorage();
-      const imgRef = refS(imageStorage, "recipeImages/" + uri);
+      const imgRef = refS(imageStorage, "recipeImages/" + uri + ".jpg");
       const url = await getDownloadURL(imgRef);
       setImageUrl(url);
-      
-      
     } catch (e) {
       console.error("Error downloading Post Image " + e.message);
     }
   };
 
+  // Fetch the image URL when the component mounts
   useEffect(() => {
-    getPostImage(post.image);
-  }, [post.image]);
+    getPostImage(postId);
+  }, [postId]);
+
   return (
-    <View style={styles.container}>
-     <Image source={imageUrl}></Image>
-    </View>
+    <TouchableOpacity onPress={() => navToPost(postId)}>
+      <View style={styles.container}>
+        <Image source={imageUrl ? { uri: imageUrl } : tempImage} style={styles.image} />
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: 'white',
     borderRadius: 5,
-    paddingHorizontal: 10,
-    margin: 10,
-    height: 150,
-    // Add shadow properties
-    elevation: 5, // for Android
-    shadowColor: '#000', // for iOS
-    shadowOffset: { width: 0, height: 2 }, // for iOS
-    shadowOpacity: 0.3, // for iOS
-    shadowRadius: 3, // for iOS
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    overflow: 'hidden',
+    margin: 2, // Add margin to each item
   },
-  input: {
-    flex: 1,
-    padding: 8,
+  image: {
+    width: 100,
+    height: 100,
+    resizeMode: 'cover',
   },
-  imageView: {
-    flexDirection: 'column',
-  },
-  leftContainerView: {
-    flexDirection: 'column',
-    flex: 1.5,
-    padding: 5,
-  },
-  rightContainerView: {
-    flexDirection: 'column',
-    flex: 3,
-  },
-  
 });
-
-export default profilePost;
+export default ProfilePost;

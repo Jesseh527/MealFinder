@@ -4,9 +4,10 @@ import { View, Text, Button, StyleSheet,FlatList } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { useCurrentUser  } from "../componets/tab"
 import { getUserProfile,getUserPosts } from '../componets/config';
+import ProfilePost from '../componets/profilePost';
 const ProfieScreen = ({ navigation }) => {  
   const [userProfile, setUserProfile] = useState(null);
-  const [userPosts, setUserPosts] = useState([]);
+  const [userPostsIds, setUserPostsIds] = useState([]);
 
   const currentUser = useCurrentUser();
   useEffect(() => {
@@ -14,11 +15,12 @@ const ProfieScreen = ({ navigation }) => {
       if (currentUser !== null) {
         const profile = await getUserProfile(currentUser.uid);
         setUserProfile(profile);
-        console.log(profile)
+        // console.log(profile)
         const posts = await getUserPosts(currentUser.uid);//otherUserProfile
-        setUserPosts(posts);
-        console.log(posts);
-      }
+        setUserPostsIds(posts);
+        // console.log(userPostsIds)
+     
+      } 
     };
 
     fetchUserProfile();
@@ -30,7 +32,7 @@ const ProfieScreen = ({ navigation }) => {
         <Text style ={{fontSize:20,padding:15}}>Please log in to acces your profile</Text>
         <Button title='click her to go to your profile' onPress={()=> navigation.navigate('Login')}/>
 
-      </View>):( <View style={styles.container}>
+      </View>):( <View style={styles.container}> 
       <View style={styles.header}>
       <ProfilePicture  profileID = {currentUser.uid}
           style={styles.profileImage} // Set the size of the profile picture
@@ -57,38 +59,16 @@ const ProfieScreen = ({ navigation }) => {
           <Text style={styles.statLabel}>Following</Text>
         </View>
       </View> 
-      <View style={styles.postsContainer}>
+      <View >
       <FlatList
-  data={userPosts}
-  keyExtractor={(item) => item.postID}
-  renderItem={({ item }) => {
-    // Get an array of postIDs from the item object
-    const postIDs = Object.keys(item);
+            data={userPostsIds}
+            renderItem={({ item }) => <ProfilePost postId={item} navigation={navigation} />}
+            numColumns={3}
+            contentContainerStyle={styles.flatListContainer}
+          />
 
-    // Find the index of the current postID
-    const currentIndex = postIDs.indexOf(item.postID);
-
-    // Get the next postID if it exists
-    const nextPostID = postIDs[currentIndex + 1];
-
-    // Get the next child based on the next postID
-    const nextChild = nextPostID ? item[nextPostID] : null;
-
-    // Access postID from the next child
-    const nextPostIDValue = nextChild ? nextChild.postID : null;
-
-    return (
-      <View style={styles.post}>
-        <Text>Hello {item.postID}</Text>
-        <Text>Next Post ID: {nextPostIDValue}</Text>
-        {/* Your post content goes here */}
       </View>
-    );
-  }}
-  numColumns={3}
-/>
-      </View>
-    </View>) }
+    </View>) }  
       
 
     </View>
@@ -154,6 +134,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
     marginBottom: 10,
   },
+  flatListContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    paddingHorizontal: -100, // Add horizontal padding to the container
+  },
+
 });
 
 export default ProfieScreen;
