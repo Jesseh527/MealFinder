@@ -4,18 +4,31 @@ import { TextInput, View, StyleSheet, TouchableOpacity, Text, Modal } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import IngredientSelection from './ingredientSelection'; // Assuming the correct import path
 
-const TextInputBar = ({ onSearch }) => {
+const TextInputBar = ({ onSearch, onClear }) => {
   const [text, setText] = useState('');
   const [showAddIngredientsModal, setShowAddIngredientsModal] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
 
   const handleSearch = () => {
     if (text.trim() === '') {
-      // Optionally handle empty search query
+      // Handle an empty search query, e.g., return all results
+      if (onSearch) {
+        onSearch(''); // You might adjust this part based on how your onSearch function handles empty queries
+      }
       return;
     }
     // Pass the search query and selected ingredients to the parent component
-    onSearch(text, selectedIngredients);
+    if (onSearch) {
+      onSearch(text, selectedIngredients);
+    }
+  };
+
+  const handleClear = () => {
+    // Clear the search text and reset the search results
+    setText('');
+    if (onClear) {
+      onClear();
+    }
   };
 
   const handleAddIngredient = () => {
@@ -48,6 +61,12 @@ const TextInputBar = ({ onSearch }) => {
           <TouchableOpacity onPress={handleSearch}>
             <Ionicons name="search" size={24} color="black" />
           </TouchableOpacity>
+
+          {text.trim() !== '' && ( // Render the clear button only when there's text in the search bar
+            <TouchableOpacity onPress={handleClear}>
+              <Ionicons name="close-circle" size={24} color="black" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
@@ -71,7 +90,6 @@ const TextInputBar = ({ onSearch }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
