@@ -1,11 +1,13 @@
 // ProfieScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet,FlatList } from 'react-native';
 import ProfilePicture from '../componets/profilePicture';
 import { useCurrentUser  } from "../componets/tab"
-import { getUserProfile } from '../componets/config';
+import { getUserProfile,getUserPosts } from '../componets/config';
+import ProfilePost from '../componets/profilePost';
 const OtherUSerProfile = ({ route,navigation }) => {  
   const [userProfile, setUserProfile] = useState(null);
+  const [userPostsIds, setUserPostsIds] = useState([]);
   const currentUser = useCurrentUser();
   console.log("adasdsaddsa")
   console.log(route.params.authorOfPost._j);
@@ -19,6 +21,8 @@ const OtherUSerProfile = ({ route,navigation }) => {
         setUserProfile(profile);
         console.log(profile)
       }
+      const posts = await getUserPosts(userId);//otherUserProfile
+        setUserPostsIds(posts);
     };
 
     fetchUserProfile();
@@ -51,17 +55,14 @@ const OtherUSerProfile = ({ route,navigation }) => {
           <Text style={styles.statLabel}>Following</Text>
         </View>
       </View> 
-      <View style={styles.postsContainer}>
-        <View style={[styles.post, {backgroundColor: "blue"}]}>
-          {/* Your post content goes here */}
-        </View>
-        <View style={styles.post}>
-          {/* Your post content goes here */}
-        </View>
-        <View style={styles.post}>
-          {/* Your post content goes here */}
-        </View>
-        {/* Add more post boxes as needed */}
+      <View >
+      <FlatList
+            data={userPostsIds}
+            renderItem={({ item }) => <ProfilePost postId={item} navigation={navigation} />}
+            numColumns={3}
+            contentContainerStyle={styles.flatListContainer}
+          />
+
       </View>
     </View>
       
@@ -128,6 +129,14 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     backgroundColor: 'lightgray',
     marginBottom: 10,
+  },
+  flatListContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width:"auto",
+    justifyContent: 'space-between',
+    marginTop: 20,
+    paddingHorizontal: 0, // Add horizontal padding to the container
   },
 });
 
