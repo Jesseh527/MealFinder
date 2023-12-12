@@ -1,16 +1,36 @@
+//textInputBar.js
 import React, { useState } from 'react';
-import { TextInput, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { TextInput, View, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import IngredientSelection from './ingredientSelection'; // Assuming the correct import path
 
 const TextInputBar = ({ onSearch }) => {
   const [text, setText] = useState('');
+  const [showAddIngredientsModal, setShowAddIngredientsModal] = useState(false);
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
 
   const handleSearch = () => {
     if (text.trim() === '') {
       // Optionally handle empty search query
       return;
     }
-    onSearch(text);
+    // Pass the search query and selected ingredients to the parent component
+    onSearch(text, selectedIngredients);
+  };
+
+  const handleAddIngredient = () => {
+    // Open the modal to add ingredients
+    setShowAddIngredientsModal(true);
+  };
+
+  const handleIngredientSelected = (ingredient) => {
+    // Add the selected ingredient to the list
+    setSelectedIngredients((prevIngredients) => [...prevIngredients, ingredient]);
+  };
+
+  const handleModalClose = () => {
+    // Close the modal
+    setShowAddIngredientsModal(false);
   };
 
   return (
@@ -31,7 +51,7 @@ const TextInputBar = ({ onSearch }) => {
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleAddIngredient}>
             <Text> Add ingredient </Text>
           </TouchableOpacity>
           <TouchableOpacity>
@@ -42,6 +62,12 @@ const TextInputBar = ({ onSearch }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Add Ingredients Modal */}
+      <Modal visible={showAddIngredientsModal} animationType="slide">
+        {/* Use the IngredientSelection component */}
+        <IngredientSelection onSelect={handleIngredientSelected} onClose={handleModalClose} />
+      </Modal>
     </View>
   );
 };
@@ -62,7 +88,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 8,
     backgroundColor: 'white',
-    borderRadius: 200, 
+    borderRadius: 200,
     elevation: 5, // for Android
     shadowColor: '#000', // for iOS
     shadowOffset: { width: 0, height: 2 }, // for iOS
