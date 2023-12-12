@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {getDatabase,ref as refD, onValue,set,get,update} from "firebase/database";
+import {getDatabase,ref as refD, onValue,set,get,update,serverTimestamp} from "firebase/database";
 import {getAuth} from "firebase/auth";
 import { getDownloadURL, getStorage, ref as refS, uploadBytesResumable,listAll } from "firebase/storage";
 import { async } from "@firebase/util";
@@ -97,7 +97,10 @@ export const getRecipInfo = async () => {
 export function createNewPost(title,cooktime,preptime,description,directions,ingredients,userID,newPostID,caloriePerServing,servingSize,totalServings){
   
   const db = getDatabase();
-  set(refD(db, 'recipe/' + newPostID), {
+  console.log("TIme:");
+  console.log({ '.sv': 'timestamp' })
+  console.log(serverTimestamp)
+  set(refD(db, 'recipe/' + newPostID), {  
     postID: newPostID,
     title:title,
     author:userID,
@@ -111,9 +114,11 @@ export function createNewPost(title,cooktime,preptime,description,directions,ing
     ratings:[],
     caloriePerServing:caloriePerServing,
     servingSize:servingSize,
-    totalServings:totalServings
+    totalServings:totalServings,
+    timestamp: { '.sv': 'timestamp' },
     
   });
+  
 }
 export function createUserInRTDB(userId, name, email) {//creats user in database
   const db = getDatabase();
