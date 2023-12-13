@@ -125,6 +125,7 @@ export function createUserInRTDB(userId, name, email) {//creats user in database
   set(refD(db, 'users/' + userId), {
     username: name,
     userID:userId,
+    timestamp: { '.sv': 'timestamp' },
     email: email,
     folowing: [],
     profile:{
