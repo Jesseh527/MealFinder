@@ -1,8 +1,9 @@
 //textInputBar.js
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { TextInput, View, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import IngredientSelection from './ingredientSelection'; // Assuming the correct import path
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TextInputBar = ({ onSearch, onClear }) => {
   const [text, setText] = useState('');
@@ -13,7 +14,7 @@ const TextInputBar = ({ onSearch, onClear }) => {
     if (text.trim() === '') {
       // Handle an empty search query, e.g., return all results
       if (onSearch) {
-        onSearch(''); // You might adjust this part based on how your onSearch function handles empty queries
+        onSearch('', selectedIngredients);
       }
       return;
     }
@@ -26,8 +27,8 @@ const TextInputBar = ({ onSearch, onClear }) => {
   const handleClear = () => {
     // Clear the search text and reset the search results
     setText('');
-    if (onClear) {
-      onClear();
+    if (onSearch) {
+      onSearch('', selectedIngredients, onClear);
     }
   };
 
@@ -36,15 +37,40 @@ const TextInputBar = ({ onSearch, onClear }) => {
     setShowAddIngredientsModal(true);
   };
 
-  const handleIngredientSelected = (ingredient) => {
-    // Add the selected ingredient to the list
+  const handleIngredientSelect = (ingredient) => {
+    // Update the selectedIngredients state by adding the selected ingredient
     setSelectedIngredients((prevIngredients) => [...prevIngredients, ingredient]);
+    // Call the onSearch callback with the current search query and updated ingredients
+    if (onSearch) {
+      onSearch(text, [...selectedIngredients, ingredient]);
+    }
   };
-
+  
+  const saveIngredients = async (ingredients) => {
+    try {
+      await AsyncStorage.setItem('selectedIngredients', JSON.stringify(ingredients));
+    } catch (error) {
+      console.error('Error saving ingredients:', error.message);
+    }
+  };
   const handleModalClose = () => {
     // Close the modal
     setShowAddIngredientsModal(false);
   };
+  useEffect(() => {
+    const loadIngredients = async () => {
+      try {
+        const storedIngredients = await AsyncStorage.getItem('selectedIngredients');
+        if (storedIngredients !== null) {
+          setSelectedIngredients(JSON.parse(storedIngredients));
+        }
+      } catch (error) {
+        console.error('Error loading ingredients:', error.message);
+      }
+    };
+
+    loadIngredients();
+  }, []); // Empty dependency array to run only once on mount
 
   return (
     <View style={styles.container}>
@@ -85,7 +111,8 @@ const TextInputBar = ({ onSearch, onClear }) => {
       {/* Add Ingredients Modal */}
       <Modal visible={showAddIngredientsModal} animationType="slide">
         {/* Use the IngredientSelection component */}
-        <IngredientSelection onSelect={handleIngredientSelected} onClose={handleModalClose} />
+        <IngredientSelection onSelect={handleIngredientSelect} onClose={handleModalClose} />
+
       </Modal>
     </View>
   );
