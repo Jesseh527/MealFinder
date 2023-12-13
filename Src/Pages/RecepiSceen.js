@@ -60,23 +60,31 @@ const RecipeScreen = ({ navigation }) => {
             console.log('Recipe Ingredients:', recipeIngredients);
             console.log('Ingredient Names:', ingredientNames);
 
-            const ingredientsIncluded = ingredients.some((selectedIngredient) => {
-              const selected = selectedIngredient.trim().toLowerCase();
-              console.log('Selected:', selected);
-
-              const ingredientIncluded = ingredientNames.some((ingredientName) => {
-                const match = ingredientName.includes(selected);
-                console.log(
-                  `Recipe Ingredient: ${ingredientName}, Selected Ingredient: ${selected}, Match: ${match}`
-                );
-                return match;
+            const ingredientsIncluded = recipeIngredients.every((recipeIngredient) => {
+              const recipeIngredientName = recipeIngredient.name.trim().toLowerCase();
+            
+              const ingredientMatch = ingredients.some((selectedIngredient) => {
+                const selected = selectedIngredient.trim().toLowerCase();
+                return recipeIngredientName.includes(selected);
               });
-
+            
               console.log(
-                `Selected Ingredient: ${selectedIngredient}, Ingredient Included: ${ingredientIncluded}`
+                `Recipe Ingredient: ${recipeIngredientName}, Ingredient Matched: ${ingredientMatch}`
               );
-              return ingredientIncluded;
+            
+              return ingredientMatch;
             });
+            
+            // ingredientsIncluded will be true only if every recipe ingredient has a match
+            return (titleMatch || descriptionMatch) && ingredientsIncluded;
+            
+            
+            
+            // ingredientsIncluded will be true only if every recipe ingredient has a match
+            return (titleMatch || descriptionMatch) && ingredientsIncluded;
+            
+            
+            
 
             console.log('Ingredients Included:', ingredientsIncluded);
 
