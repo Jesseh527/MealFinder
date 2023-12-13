@@ -1,14 +1,19 @@
-//textInputBar.js
-import React, { useState,useEffect } from 'react';
+// TextInputBar.js
+
+import React, { useState, useEffect } from 'react';
 import { TextInput, View, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import IngredientSelection from './ingredientSelection'; // Assuming the correct import path
+import IngredientSelection from './ingredientSelection';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const TextInputBar = ({ onSearch, onClear }) => {
+const TextInputBar = ({
+  onSearch,
+  onClear,
+  selectedIngredients,
+  setSelectedIngredients,
+}) => {
   const [text, setText] = useState('');
   const [showAddIngredientsModal, setShowAddIngredientsModal] = useState(false);
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
 
   const handleSearch = () => {
     if (text.trim() === '') {
@@ -45,7 +50,7 @@ const TextInputBar = ({ onSearch, onClear }) => {
       onSearch(text, [...selectedIngredients, ingredient]);
     }
   };
-  
+
   const saveIngredients = async (ingredients) => {
     try {
       await AsyncStorage.setItem('selectedIngredients', JSON.stringify(ingredients));
@@ -53,10 +58,12 @@ const TextInputBar = ({ onSearch, onClear }) => {
       console.error('Error saving ingredients:', error.message);
     }
   };
+
   const handleModalClose = () => {
     // Close the modal
     setShowAddIngredientsModal(false);
   };
+
   useEffect(() => {
     const loadIngredients = async () => {
       try {
@@ -112,11 +119,11 @@ const TextInputBar = ({ onSearch, onClear }) => {
       <Modal visible={showAddIngredientsModal} animationType="slide">
         {/* Use the IngredientSelection component */}
         <IngredientSelection onSelect={handleIngredientSelect} onClose={handleModalClose} />
-
       </Modal>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
