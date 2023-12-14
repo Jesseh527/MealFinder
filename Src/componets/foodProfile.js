@@ -177,6 +177,21 @@ export default function FoodProfile({ route,navigation }) {
           <Text style ={styles.headerText}>Directions:</Text>
           <Text>{post.directions}</Text>
         </View>
+        {currentUser && currentUser.uid === post.author && (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+          <TouchableOpacity onPress={console.log('delete')}>
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>Delete Post</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=> navigation.navigate('EditFood',{post})}>
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>Edit Post</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
+        
         
         <View style={{width:100,height:100}}/>
       </View>
@@ -202,6 +217,15 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,  // Adjust the font size as needed
+    fontWeight: 'bold',
+  },
+  button: {
+    backgroundColor: '#FF0000', // Red color as an example, you can change it
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#FFFFFF', // White color for text, you can change it
     fontWeight: 'bold',
   },
 });
