@@ -4,7 +4,7 @@ import { ref as refS, getDownloadURL, getStorage } from 'firebase/storage';
 import { getUserProfile } from './config';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useCurrentUser  } from "../componets/tab"
-import { updateUserRating, updatePostRating,db } from './config';
+import { updateUserRating, updatePostRating,db,deletePost } from './config';
 import {getDatabase,ref as refD, onValue,set,get,update} from "firebase/database";
 
 
@@ -13,7 +13,8 @@ export default function FoodProfile2({ route,navigation }) {
   console.log(route);
   
   const post = route.params.post;
-  console.log(post);
+  console.log("dalek")
+  console.log(post); 
   const tempImage = require('../../assets/imageplaceholder.png');
   const [imageUrl, setImageUrl] = useState(null);
   const [numReviews, setNumReviews] = useState(0);
@@ -160,7 +161,7 @@ export default function FoodProfile2({ route,navigation }) {
               <Text>by: {authorOfPost._j ? authorOfPost._j.username : 'Loading...'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> 
         <View style={styles.container}>
           <Text style={styles.headerText}>Rating:</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -183,12 +184,16 @@ export default function FoodProfile2({ route,navigation }) {
         </View>
         {currentUser && currentUser.uid === post.author && (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-          <TouchableOpacity onPress={console.log('delete')}>
+          <TouchableOpacity onPress={() => {
+            deletePost(post.postID,post.title);
+            navigation.navigate('Profile');
+
+          }}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>Delete Post</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={console.log('edit')}>
+          <TouchableOpacity onPress={()=> navigation.navigate('EditFood',{post})}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>Edit Post</Text>
             </View>

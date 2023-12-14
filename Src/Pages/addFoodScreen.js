@@ -56,7 +56,7 @@
 
     const addIngredient = () => {
       if (ingredient && amount) {
-          const index = Object.keys(ingredientList).length + 1;
+          const index = Object.keys(ingredientList).length;
           const newIngredient = { name: ingredient, amount };
           setIngredientList({ ...ingredientList, [index]: newIngredient });
           setIngredient('');

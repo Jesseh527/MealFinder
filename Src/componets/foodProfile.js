@@ -179,7 +179,11 @@ export default function FoodProfile({ route,navigation }) {
         </View>
         {currentUser && currentUser.uid === post.author && (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-          <TouchableOpacity onPress={console.log('delete')}>
+          <TouchableOpacity onPress={() => {
+            deletePost(post.postID,post.title);
+            navigation.navigate('Profile');
+
+          }}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>Delete Post</Text>
             </View>

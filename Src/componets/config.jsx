@@ -1,10 +1,12 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import {getDatabase,ref as refD, onValue,set,get,update,serverTimestamp} from "firebase/database";
+import {getDatabase,ref as refD, onValue,set,get,update,serverTimestamp,remove } from "firebase/database";
 import {getAuth} from "firebase/auth";
 import { getDownloadURL, getStorage, ref as refS, uploadBytesResumable,listAll } from "firebase/storage";
 import { async } from "@firebase/util";
+import { Alert } from 'react-native';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -252,6 +254,39 @@ export const getRecipInfoFromPostId = async (id) => {
     return postProfile;
   } catch (error) {
     console.error('Error fetching recipe profile:', error.message);
+    throw error;
+  }
+};
+
+export const deletePost = async (postId,title) => {
+  try {
+    // Reference to the post in the Realtime Database
+    const postRef = refD(db, `recipe/${postId}`);
+
+    // Ask for confirmation
+    Alert.alert(
+      'Confirm Deletion',
+      `Are you sure you want to delete "${title}"?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            // Remove the post data
+            await remove(postRef);
+            console.log('Recipe deleted successfully');
+
+            // If you want to navigate after deletion, you can call the navigateToRecipe function here
+          
+          },
+        },
+      ]
+    );
+  } catch (error) {
+    console.error('Error deleting recipe:', error.message);
     throw error;
   }
 };

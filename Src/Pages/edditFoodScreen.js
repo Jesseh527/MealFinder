@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, Image, FlatList, TouchableOpacity, StyleSheet, Button, TextInput, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer,useFocusEffect } from '@react-navigation/native';
 import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { TextInputMask } from 'react-native-masked-text';
 import * as ImagePicker from 'expo-image-picker';
 import { useCurrentUser } from '../componets/tab';
 import { uploadToFirebase, generateUniqueId, createNewPost } from '../componets/config';
+import { ref as refS, getDownloadURL, getStorage } from 'firebase/storage';
+
 
 export default function EdditFoodScreen({ route, navigation }) {
   const { post } = route.params;
@@ -21,27 +23,24 @@ export default function EdditFoodScreen({ route, navigation }) {
   const [caloriePerServing, setCaloriePerServing] = useState(post.caloriePerServing || '0');
   const [servingSize, setServingSize] = useState(post.servingSize || '');
   const [totalServing, setTotalServings] = useState(post.totalServings || '0');
-  const [description, setDescription] = useState(post.description || '');
+  const [description, setDescription] = useState(post.description || ''); 
   const [directions, setDirections] = useState(post.directions || '');
   const [ingredient, setIngredient] = useState('');
   const [amount, setAmount] = useState('');
   const [ingredientList, setIngredientList] = useState([]);
 
-  const resetRecipieConst = () => {
-    setPostName('');
-    setImageSource(uploadImagePlaceHolder);
-    setCookTimeValue('0');
-    setPrepTimeValue('0');
-    setCaloriePerServing('0');
-    setServingSize('');
-    setTotalServings('0');
-    setDescription('');
-    setDirections(''); 
-    setIngredient('');
-    setAmount('');
-    setIngredientList([]);
-  };
+  
+  const getPostImage = async (uri) => {
+    try {
+      const imageStorage = getStorage();
+      const imgRef = refS(imageStorage, 'recipeImages/' + uri);
+      const url = await getDownloadURL(imgRef);
 
+      setImageSource(url);
+    } catch (e) {
+      console.error('Error downloading Post Image ' + e.message);
+    }
+  };
   const handleCookInputChange = (text) => {
     const numericText = text.replace(/[^0-9]/g, '');
     const truncatedText = numericText.slice(0, 4);
@@ -56,15 +55,17 @@ export default function EdditFoodScreen({ route, navigation }) {
 
   const addIngredient = () => {
     if (ingredient && amount) {
-      const newIngredient = { name: ingredient, amount };
-      setIngredientList([...ingredientList, newIngredient]);
-      setIngredient('');
-      setAmount('');
-    }
+        const index = Object.keys(ingredientList).length;
+        const newIngredient = { name: ingredient, amount };
+        setIngredientList({ ...ingredientList, [index]: newIngredient });
+        setIngredient('');
+        setAmount('');
+      }
+    console.log(ingredientList);
   };
 
-  const removeIngredient = (index) => {
-    const updatedList = [...ingredientList];
+  const removeIngredient = (index) => { 
+    const updatedList = [...ingredientList]; 
     updatedList.splice(index, 1);
     setIngredientList(updatedList);
   };
@@ -80,18 +81,25 @@ export default function EdditFoodScreen({ route, navigation }) {
         text: 'OK',
         onPress: async () => {
           try {
-            const uploadResp = await uploadToFirebase(imageSource.uri, `recipeImages/${post.postID}.jpg`, (v) => console.log(v + ' : ' + imageSource));
+            console.log( post.postID);
+            console.log(imageSource.uri); 
+            console.log(imageSource);
+            const uploadResp = await uploadToFirebase(imageSource, 'recipeImages/' + post.postID + '.jpg', (v) => console.log(v + ' : ' + imageSource));
+            console.log('success:' + uploadResp);
+            console.log('picUploaded');
             createNewPost(postName, cookTimeValue, prepTimeValue, description, directions, ingredientList, currentUser.uid, post.postID, caloriePerServing, servingSize, totalServing);
-            resetRecipieConst();
-
+          
             // Show success alert
             Alert.alert('Success', 'Recipe submitted successfully!');
+            navigation.navigate("Recipe");
           } catch (error) {
             // Handle any errors here
             console.error('Error:', error);
+            Alert.alert('Error', 'Failed to submit recipe. Please check your internet connection and try again.');
           }
+          
         },
-      },
+      }, 
     ]);
   };
 
@@ -112,11 +120,32 @@ export default function EdditFoodScreen({ route, navigation }) {
       Alert.alert("Error Uploading Image " + e.message);
     }
   };
+  useFocusEffect(
+    React.useCallback(() => {
+      // Your code to run when the screen is focused
+      const initialIngredientList = Object.values(post.ingredients);
+      setIngredientList(initialIngredientList);
+      getPostImage(post.image);
 
+      // Assign initial values to other state variables
+      setPostName(post.title || ''); 
+      setImageSource(post.image ? { uri: post.image } : uploadImagePlaceHolder);
+      setCookTimeValue(post.cooktime || '0');
+      setPrepTimeValue(post.preptime || '0');
+      setCaloriePerServing(post.caloriePerServing || '0');
+      setServingSize(post.servingSize || '');
+      setTotalServings(post.totalServings || '0');
+      setDescription(post.description || '');
+      setDirections(post.directions || '');
+    }, [route.params.post])
+  );
+
+
+ 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}> 
       <ScrollView style={styles.container}>
-        {currentUser == null ? (
+        {currentUser == null ? ( 
           <View>
             <Text style={{ fontSize: 20, padding: 15 }}>Please log in to access your profile</Text>
             <Button title='Click here to go to your profile' onPress={() => navigation.navigate('Login')} />
@@ -124,11 +153,15 @@ export default function EdditFoodScreen({ route, navigation }) {
         ) : (
           <View>
             <View style={{ flexDirection: 'row' }}>
-              <View style={{ flex: 1 }}>
-                <TouchableOpacity onPress={selectImage} style={{ backgroundColor: "grey" }}>
-                  <Image source={imageSource} style={{ width: '100%', height: 150 }} />
-                </TouchableOpacity>
-              </View>
+            <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={selectImage} style={{ backgroundColor: "grey" }}>
+              {typeof imageSource === 'string' ? (
+                <Image source={{ uri: imageSource }} style={{ width: '100%', height: 150 }} />
+              ) : (
+                <Image source={imageSource} style={{ width: '100%', height: 150 }} />
+              )}
+          </TouchableOpacity> 
+            </View>
               <View style={{ flex: 1, flexDirection: 'column' }}>
                 <TextInput
                   placeholder="Title"
@@ -140,7 +173,7 @@ export default function EdditFoodScreen({ route, navigation }) {
                   <Text style={{ paddingTop: 10 }}>Prep time in minutes </Text>
                   <TextInput
                     style={styles.numInput}
-                    value={prepTimeValue}
+                    value={prepTimeValue.toString()}
                     onChangeText={handlePrepInputChange}
                     placeholder="0"
                     keyboardType="numeric"
@@ -151,7 +184,7 @@ export default function EdditFoodScreen({ route, navigation }) {
                   <Text style={{ paddingTop: 10 }}>Cook time in minutes </Text>
                   <TextInput
                     style={styles.numInput}
-                    value={cookTimeValue}
+                    value={cookTimeValue.toString()}
                     onChangeText={handleCookInputChange}
                     placeholder="0"
                     keyboardType="numeric"
@@ -164,7 +197,7 @@ export default function EdditFoodScreen({ route, navigation }) {
               <Text style={{ paddingTop: 10 }}>calorie Per Serving </Text>
               <TextInput
                 style={styles.numInput}
-                value={caloriePerServing}
+                value={caloriePerServing.toString()}
                 onChangeText={setCaloriePerServing}
                 placeholder="0"
                 keyboardType="numeric"
@@ -175,7 +208,7 @@ export default function EdditFoodScreen({ route, navigation }) {
               <Text style={{ paddingTop: 10 }}>serving size             </Text>
               <TextInput
                 style={styles.numInput}
-                value={servingSize}
+                value={servingSize.toString()}
                 onChangeText={setServingSize}
                 placeholder="serving size"
               />
@@ -184,7 +217,7 @@ export default function EdditFoodScreen({ route, navigation }) {
               <Text style={{ paddingTop: 10 }}>total servings        </Text>
               <TextInput
                 style={styles.numInput}
-                value={totalServing}
+                value={totalServing.toString()}
                 onChangeText={setTotalServings}
                 placeholder="0"
                 keyboardType="numeric"
@@ -225,15 +258,16 @@ export default function EdditFoodScreen({ route, navigation }) {
                 <Button title='Add' onPress={addIngredient} />
               </View>
               <View>
-                {ingredientList.map((item, index) => (
-                  <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, overflow: 'hidden' }}>
-                    <ScrollView horizontal>
-                      <Text>{`${item.name}: ${item.amount}`}</Text>
-                    </ScrollView>
-                    <TouchableOpacity onPress={() => removeIngredient(index)} style={{ marginLeft: 10 }}>
-                      <Text style={{ color: 'red' }}>Remove</Text>
-                    </TouchableOpacity>
-                  </View>
+              {Object.keys(ingredientList).map((index) => (
+                  <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, overflow: 'hidden', }}>
+                  <ScrollView horizontal>
+                    <Text>{`${index}{name: ${ingredientList[index].name}, amount: ${ingredientList[index].amount}}`}</Text>
+                  </ScrollView>
+                  <TouchableOpacity onPress={() => removeIngredient(index)} style={{ marginLeft: 10 }}>
+                    <Text style={{ color: 'red' }}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+                  
                 ))}
                 <Button title='PUBLISH EDITED RECIPE' onPress={uploadRecipe}></Button>
                 <View style={{ height: 100, width: 100 }}></View>
