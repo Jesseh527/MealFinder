@@ -163,6 +163,7 @@ export default function EdditFoodScreen({ route, navigation }) {
           </TouchableOpacity> 
             </View>
               <View style={{ flex: 1, flexDirection: 'column' }}>
+              <View style={{width:1,height:1}} ></View>
                 <TextInput
                   placeholder="Title"
                   value={postName}

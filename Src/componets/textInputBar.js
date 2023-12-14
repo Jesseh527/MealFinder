@@ -1,7 +1,7 @@
 // TextInputBar.js
 
 import React, { useState, useEffect } from 'react';
-import { TextInput, View, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
+import { TextInput, View, StyleSheet, TouchableOpacity, Text, Modal, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import IngredientSelection from './ingredientSelection';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,20 +17,17 @@ const TextInputBar = ({
 
   const handleSearch = () => {
     if (text.trim() === '') {
-      // Handle an empty search query, e.g., return all results
       if (onSearch) {
         onSearch('', selectedIngredients);
       }
       return;
     }
-    // Pass the search query and selected ingredients to the parent component
     if (onSearch) {
       onSearch(text, selectedIngredients);
     }
   };
 
   const handleClear = () => {
-    // Clear the search text and reset the search results
     setText('');
     if (onSearch) {
       onSearch('', selectedIngredients, onClear);
@@ -38,14 +35,11 @@ const TextInputBar = ({
   };
 
   const handleAddIngredient = () => {
-    // Open the modal to add ingredients
     setShowAddIngredientsModal(true);
   };
 
   const handleIngredientSelect = (ingredient) => {
-    // Update the selectedIngredients state by adding the selected ingredient
     setSelectedIngredients((prevIngredients) => [...prevIngredients, ingredient]);
-    // Call the onSearch callback with the current search query and updated ingredients
     if (onSearch) {
       onSearch(text, [...selectedIngredients, ingredient]);
     }
@@ -60,7 +54,6 @@ const TextInputBar = ({
   };
 
   const handleModalClose = () => {
-    // Close the modal
     setShowAddIngredientsModal(false);
   };
 
@@ -82,6 +75,7 @@ const TextInputBar = ({
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
+        <View style={{width:1,height:15}} ></View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TextInput
             style={styles.input}
@@ -95,7 +89,7 @@ const TextInputBar = ({
             <Ionicons name="search" size={24} color="black" />
           </TouchableOpacity>
 
-          {text.trim() !== '' && ( // Render the clear button only when there's text in the search bar
+          {text.trim() !== '' && (
             <TouchableOpacity onPress={handleClear}>
               <Ionicons name="close-circle" size={24} color="black" />
             </TouchableOpacity>
@@ -115,9 +109,7 @@ const TextInputBar = ({
         </View>
       </View>
 
-      {/* Add Ingredients Modal */}
       <Modal visible={showAddIngredientsModal} animationType="slide">
-        {/* Use the IngredientSelection component */}
         <IngredientSelection onSelect={handleIngredientSelect} onClose={handleModalClose} />
       </Modal>
     </View>
@@ -134,18 +126,23 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   inputContainer: {
-    width: '100%', // Set width to 100% to take full width
+    width: '100%',
   },
   input: {
     flex: 1,
     padding: 8,
     backgroundColor: 'white',
     borderRadius: 200,
-    elevation: 5, // for Android
-    shadowColor: '#000', // for iOS
-    shadowOffset: { width: 0, height: 2 }, // for iOS
-    shadowOpacity: 0.3, // for iOS
-    shadowRadius: 3, // for iOS
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    ...Platform.select({
+      ios: {
+        height: 40, // Specify a fixed height on iOS to prevent issues
+      },
+    }),
   },
 });
 
