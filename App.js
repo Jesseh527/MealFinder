@@ -1,20 +1,26 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+  import * as React from 'react';
+  import { Text, View,Image } from 'react-native';
+  import { NavigationContainer } from '@react-navigation/native';
+  import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+  import Ionicons from 'react-native-vector-icons/Ionicons';
+  import { useState,useEffect } from 'react';
+  import MyTabs from './Src/componets/tab';
+  import { User,onAuthStateChanged} from '@firebase/auth';
+  import { FIREBASE_AUTH } from './Src/componets/config';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  export default function App() {
+    // const[user,setUser] = useState<User | null>(null);
+    // useEffect(()=>{
+    //   onAuthStateChanged(FIREBASE_AUTH, (user) => {
+    //     console.log('user',user);
+    //     setUser(user);
+    //   });
+    // },[]);
+    return (
+      <NavigationContainer  >
+        
+        <MyTabs></MyTabs>
+      </NavigationContainer>
+    );
+  }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
